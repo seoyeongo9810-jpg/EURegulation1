@@ -1,0 +1,2105 @@
+# EU 철강 탄소중립 정책 데이터
+#
+# 2026-10-27 공식 출처 조사 반영 (Commission DG 페이지, OEIL, Have Your Say API, Council 보도자료).
+#  - EUR-Lex는 자동 조회가 차단되어 본문을 직접 열람하지 못했습니다. ELI 링크는 공식 번호 체계로 작성했습니다.
+#  - 각 항목 위 주석에 사용한 출처 URL이 있습니다.
+#  - verify_needed: true 항목은 note에 남은 확인 사항을 적었습니다. 주간 업데이트 때 우선 확인하세요.
+#
+# 필드 설명은 src/models.py 참고. 의견수렴 상태·D-day·재확인 필요 여부는 앱이 계산하므로 적지 않습니다.
+
+
+# ============================================================
+# 출처 조사 파일: research_cbam_trade
+# ============================================================
+# CBAM·철강 무역조치 리서치 결과 (2026-10-27 조사)
+# 대상: cbam, cbam_downstream, cbam_export, cbam_secondary_acts, steel_trade_measure + 신규 wsr_scrap_export_list
+# 조사 메모:
+#  - EUR-Lex 본문은 자동 조회가 차단되어 직접 열람하지 못함. ELI 링크는 공식 번호 체계로 작성했고,
+#    법령 세부 조항은 Commission 공식 페이지·OEIL·Have Your Say API·Commission CBAM Q&A(2026.10.15판)로 교차 확인함.
+#  - Have Your Say 링크는 이니셔티브 ID 기반 고정 URL(.../initiatives/{ID}_en) 형식임(접속 확인, slug 미포함).
+
+# ------------------------------------------------------------
+# cbam 출처:
+#  - https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism_en (확정기간 2026.1.1 개시, 인증서·등록부)
+#  - https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism/cbam-legislation-and-guidance_en (이행·위임법령 목록, 가이던스 2026.8.14)
+#  - Commission CBAM Q&A (Last updated 15 October 2026): https://taxation-customs.ec.europa.eu/document/download/013fa763-5dce-4726-a204-69fec04d5ce2_en
+#    (50t 기준, 2027.2.1 인증서 판매 개시·CCP 가동, 2027.9.30 첫 신고·제출, 2027년부터 분기 50% 보유, 기본값 mark-up 10/20/30%,
+#     간접배출은 시멘트·비료·소결광만 대상, 첫 검증기관 인정 2026.9경)
+#  - Reg. 2025/2083 채택 2025.10.8(Q&A 1.2), 관보 2025.10.17·발효 2025.10.20: https://www.mayerbrown.com/en/insights/publications/2025/10/eu-adopts-cbam-simplification-regulation-10-key-amendments-and-challenges-ahead (관보일 보조 출처)
+#  - https://eur-lex.europa.eu/eli/reg/2023/956/oj , https://eur-lex.europa.eu/eli/reg/2025/2083/oj
+# ------------------------------------------------------------
+- id: cbam
+  name_ko: 탄소국경조정제도
+  name_en: Carbon Border Adjustment Mechanism (CBAM)
+  status: in_force
+  legal_form: Regulation
+  legal_ref: "Regulation (EU) 2023/956 (Regulation (EU) 2025/2083으로 개정)"
+  dg: TAXUD
+  category: [carbon_pricing_trade]
+  steel_relevance: high
+  effective_date: 2023-10-01
+  summary: >
+    EU로 수입되는 철강 등 탄소집약 제품의 내재배출량에 EU ETS 수준의 탄소가격을 부과하는 제도.
+    2023.10~2025.12 전환기간(분기 보고)을 거쳐 2026.1.1 확정기간이 시작되었다.
+    간소화 개정(Reg. (EU) 2025/2083, 2025.10.8 채택)으로 연간 50톤 미만(수소·전력 제외) 수입자는 면제되며,
+    인증서 판매는 2027.2.1 공동중앙플랫폼(CCP)에서 시작되고 2026년분 첫 신고·제출 기한은 2027.9.30이다.
+  requirements:
+    - type: carbon_footprint
+      text: 설비 단위 내재배출량 산정. 철강은 직접배출만 대상(간접배출은 시멘트·비료·소결광에 한정)
+    - type: mrv
+      text: 실측값 사용 시 인정받은 CBAM 검증기관의 검증 필요. 실측값이 없으면 기본값(Reg. 2025/2621, mark-up 2026년 10%·2027년 20%·2028년부터 30%) 적용
+    - type: certificate
+      text: 2027.2.1부터 CCP에서 인증서 구매. 2026년분 연간 신고·인증서 제출 2027.9.30까지, 2027년부터 분기말마다 연초 이후 수입분 내재배출량의 50% 이상 보유
+    - type: certificate
+      text: 원산지에서 실제 납부한 탄소가격만큼 제출 인증서 수 감축 가능(세부 이행법령 제정 중), ETS 무상할당 조정분 차감
+    - type: trade_measure
+      text: 연간 50톤(단일 질량 기준) 초과 수입 시 허가 신고인(Authorised CBAM declarant) 지위 필요
+  scope: "CBAM 부속서 I의 철강 품목(CN 2601 12 00 소결광, 72류 대부분, 7301~7311, 7318, 7326 등), 연간 누적 50톤 초과 수입자"
+  sub_acts:
+    - "Regulation (EU) 2025/2083 (간소화 개정, 2025.10.8 채택)"
+    - "Implementing Regulation (EU) 2025/2547 (내재배출량 산정방법)"
+    - "Implementing Regulation (EU) 2025/2546 (검증 원칙), Delegated Regulation (EU) 2025/2551 (인정·검증)"
+    - "Implementing Regulation (EU) 2025/2548 (인증서 가격 산정·공표)"
+    - "Implementing Regulation (EU) 2025/2620 (무상할당 조정·CBAM 벤치마크)"
+    - "Implementing Regulation (EU) 2025/2621 (기본값), 2026/1740 (기본값 정정)"
+    - "Implementing Regulation (EU) 2025/486·2025/2549 (허가 신고인), 2024/3210·2025/2550 (CBAM 등록부)"
+    - "Implementing Regulation (EU) 2025/2619 (세관 정보 전달), 2025/2210 (대륙붕·EEZ 반입 물품)"
+  milestones:
+    - date: 2023-10-01
+      label: 전환기간 시작(보고 의무)
+    - date: 2025-10-20
+      label: 간소화 개정 Reg. (EU) 2025/2083 발효
+    - date: 2026-01-01
+      label: 확정기간 시작(허가 신고인만 수입, 2026년 수입분부터 재정 의무)
+    - date: 2026-08-14
+      label: 확정기간 가이던스(철강 Guidance 5d 포함) 공표
+    - date: 2027-02-01
+      label: 공동중앙플랫폼(CCP) 가동, CBAM 인증서 판매 개시
+    - date: 2027-09-30
+      label: 2026년분 첫 연간 CBAM 신고 및 인증서 제출 마감
+    - date: 2028-01-01
+      label: 기본값 mark-up 30% 적용 시작
+  consultations: []
+  impact:
+    eu_producers:
+      level: medium
+      obligations: 직접 의무 없음 (EU ETS 무상할당 단계적 축소와 연동)
+      costs: 무상할당 축소에 따른 탄소비용 증가
+      opportunities: 수입재와의 탄소비용 격차 해소
+    non_eu_producers:
+      level: high
+      obligations: EU 수입자(허가 신고인)에게 설비 단위 내재배출량 데이터와 검증보고서 제공, CBAM 등록부에 운영자로 등록 가능
+      costs: 수입자가 부담하는 인증서 비용이 수출 가격 협상에 반영. 기본값 사용 시 mark-up(2026 10%→2028 30%)으로 부담 증가
+      preparation: 설비별 배출량 모니터링·산정 체계, 인정받은 CBAM 검증기관 확보(첫 인정 2026.9경, 검증은 2027년 초), 원산지 탄소가격 납부 증빙
+      opportunities: 실측 배출량이 기본값보다 낮으면 가격 경쟁력 확보, 저탄소 제품 차별화
+    korea_note: >
+      포스코·현대제철 등의 대EU 수출 주력품목(열연·냉연·도금강판·스테인리스·강관 등)은 모두 CBAM 대상이다.
+      2026년 수출분은 2027.9.30 첫 신고 시 실측값을 쓰려면 2027년 초까지 인정받은 검증기관의 검증을 마쳐야 하므로,
+      설비별 2026년 배출 데이터 정리와 검증기관 계약을 서둘러야 한다. 철강은 간접배출이 제외되므로 직접배출 산정 정확도가 핵심이다.
+      K-ETS 납부 탄소가격 공제는 별도 이행법령(초안 피드백 2026.6 마감)이 확정되어야 하므로 무상할당분 차감 방식과 증빙 요건을 주시해야 한다.
+      한국산 기본값(2025/2621, 2026/1740 정정)과 실측값을 비교해 고객사(EU 수입자)에게 유리한 데이터를 제공할 준비가 필요하다.
+  links:
+    commission: "https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism_en"
+    eurlex: "https://eur-lex.europa.eu/eli/reg/2023/956/oj"
+    guidance: "https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism/cbam-legislation-and-guidance_en"
+  related: [eu_ets, cbam_downstream, cbam_export, cbam_secondary_acts]
+  verify_needed: false
+  note: >
+    seed 대비 수정: 철강은 간접배출 제외(Q&A 4.20). 2025/2083 관보일(2025.10.17)·발효일(2025.10.20)은 보조 출처 기준이며 EUR-Lex 직접 열람은 못 함.
+    CN 범위는 Reg. 2023/956 부속서 I 기준 요약으로 EUR-Lex 원문 재대조 권장.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# cbam_downstream 출처:
+#  - OEIL 2025/0419(COD): https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2025/0419(COD)
+#    (COM(2025)989 2025.12.17, ENVI 표결 2026.7.6, A10-0201/2026, 본회의 1독 입장 2026.9.15 T10-0276/2026, 협상 위해 위원회 회부)
+#  - EPRS At a glance: https://eprs.europarl.europa.eu/contents/publications/EPRS/2026/09/EPRS_ATA(2026)791461.html?locale=EN
+#    (Commission 180개, Council 일반접근 2026.6.12, ENVI 457개 품목, 반우회 요소)
+#  - Council 일반접근 문서 ST 10423/26 (2026.6.12 ECOFIN): https://www.consilium.europa.eu/en/press/press-releases/2026/06/12/council-moves-to-strengthen-the-eu-s-carbon-border-adjustment-mechanism/ (자동 조회 403, 제목만 확인)
+#  - Have Your Say 14748 (API): CfE·공개협의 2025.7.1~2025.8.26: https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14748_en
+#  - 트릴로그 일정(보조 출처): https://www.mayerbrown.com/en/insights/publications/2026/10/eus-cbam-downstream-extension-and-anti-circumvention-amendments-the-road-to-trilogue
+# ------------------------------------------------------------
+- id: cbam_downstream
+  name_ko: CBAM 적용범위 확대 (하류제품·우회방지)
+  name_en: CBAM extension to downstream goods and anti-circumvention measures
+  status: pending
+  stage: trilogue
+  legal_form: Regulation
+  legal_ref: "COM(2025) 989 / 2025/0419(COD)"
+  dg: TAXUD
+  category: [carbon_pricing_trade]
+  steel_relevance: high
+  summary: >
+    철강·알루미늄 집약 하류제품(Commission안 약 180개 품목)을 CBAM 대상에 추가하고 우회방지 조항을 도입하는 개정안.
+    2025.12.17 Commission 제안, 2026.6.12 이사회 일반접근(약 200개 품목 추가), 2026.9.15 유럽의회 1독 입장 채택 후
+    3자 협상(트릴로그)이 진행 중이다. Commission안 적용 목표는 2028.1.1.
+  requirements:
+    - type: carbon_footprint
+      text: 철강·알루미늄 집약 하류제품까지 내재배출량 신고·인증서 의무 확대(대상 품목 수는 협상 중)
+    - type: trade_measure
+      text: 우회방지 조항(우회 정의, 자원 셔플링, 공급망 인위 조정 대응, 신뢰성 낮은 경우 국가 기본값 적용 등)
+    - type: carbon_footprint
+      text: 소비 전(pre-consumer) 철강 스크랩을 전구물질로 취급하는 방안(기관별 입장 상이)
+  scope: "철강·알루미늄 집약 하류제품: Commission 약 180개, 이사회 약 200개 추가, 의회(ENVI) 457개 품목 — 최종 범위 미정"
+  milestones:
+    - date: 2025-08-26
+      label: Call for Evidence·공개협의 마감
+    - date: 2025-12-17
+      label: Commission 제안 COM(2025) 989
+    - date: 2026-06-12
+      label: 이사회(ECOFIN) 일반접근 합의
+    - date: 2026-07-06
+      label: 유럽의회 ENVI 위원회 표결
+    - date: 2026-09-15
+      label: 유럽의회 본회의 1독 입장 채택, 트릴로그 개시
+    - date: 2026-10-20
+      label: 첫 정치적 트릴로그(보조 출처 기준)
+    - date: 2026-11-30
+      label: 두 번째 트릴로그 잠정 예정(보조 출처 기준)
+    - date: 2028-01-01
+      label: 하류제품 적용 목표(Commission안)
+  consultations:
+    - type: call_for_evidence
+      title: "Extension of the scope of the carbon border adjustment mechanism to downstream products and anti-circumvention measures"
+      start: 2025-07-01
+      end: 2025-08-26
+      summary: 하류제품 CBAM 확대와 우회방지 조치의 필요성·설계 방향에 대한 의견 수렴(영향평가용 Call for Evidence, 352건 접수)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14748_en"
+    - type: public_consultation
+      title: "Extension of the scope of the carbon border adjustment mechanism to downstream products and anti-circumvention measures"
+      start: 2025-07-01
+      end: 2025-08-26
+      summary: 하류제품 대상 선정 기준, 탄소누출 위험, 우회 행태와 대응 수단에 대한 공개 설문(371건 접수)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14748_en"
+  impact:
+    eu_producers:
+      level: medium
+      obligations: 역내 하류제품 생산자에 직접 의무 없음
+      opportunities: 하류제품 수입재와의 탄소비용 격차 해소, 상류 CBAM 회피형 우회수입 차단
+    non_eu_producers:
+      level: high
+      obligations: 하류제품 수출 시에도 수입자에게 내재배출량 데이터(전구물질 강재 포함) 제공
+      costs: 하류제품 단위 인증서 비용 발생 및 공급망 배출 데이터 관리 부담
+      preparation: 하류제품에 투입된 강재의 원산지·설비별 배출량 추적 체계
+      opportunities: 실측 저탄소 강재를 쓰는 하류제품의 차별화
+    korea_note: >
+      확정 시 한국산 강재를 원료로 한 자동차부품·기계·전기기기 등 하류제품 수출에도 CBAM 비용이 붙는다.
+      의회안(457개)은 Commission안(약 180개)보다 범위가 훨씬 넓어 최종 품목 목록이 핵심 변수다.
+      철강사는 하류 고객사(부품·가전·건설자재 업체)에 강재 배출량 데이터를 제공할 수 있도록 제품·로트 단위 데이터 체계를 준비하고,
+      트릴로그 결과(2026년 말 합의 목표)와 최종 CN 목록을 확인해 영향 품목을 선별해야 한다.
+  links:
+    commission: "https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism/cbam-legislation-and-guidance_en"
+    eurlex: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:52025PC0989"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14748_en"
+    oeil: "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2025/0419(COD)"
+  related: [cbam, cbam_export, cbam_secondary_acts]
+  verify_needed: true
+  note: >
+    트릴로그 일정(2026.10.20 1차, 11.30 2차)과 1차 결과(합의 불발 보도)는 법률사무소·업계 보조 출처만 확인됨. 이사회 일반접근 품목 수(약 200개 추가)는
+    EPRS·Mayer Brown 기준. 제안 이후 Have Your Say 제안서 피드백 기간은 API에서 확인되지 않음. 적용 개시일은 최종 합의 시 재확인 필요.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# cbam_export 출처 (임시 탈탄소 기금으로 재정의):
+#  - OEIL 2025/0418(COD): https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2025/0418(COD)
+#    (COM(2025)990 2025.12.17, ENVI 표결 2026.7.6, A10-0202/2026, 본회의 2026.9.15 T10-0277/2026, 이사회 입장 없음)
+#  - OEIL 요약: https://oeil.europarl.europa.eu/oeil/en/document-summary?id=1914946 (목적·대상·재원·기간, 의회 수정 433/97/146)
+#  - Commission 법령 페이지(제안 목록 COM(2025)990): https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism/cbam-legislation-and-guidance_en
+#  - EPRS: https://epthinktank.eu/2026/03/03/temporary-decarbonisation-fund-eu-legislation-in-progress/ (철강·알루미늄·비료 대상)
+# ------------------------------------------------------------
+- id: cbam_export
+  name_ko: CBAM 수출 탄소유출 대응 — 임시 탈탄소 기금(TDF)
+  name_en: Temporary Decarbonisation Fund (CBAM export-related carbon leakage)
+  status: pending
+  stage: proposal
+  legal_form: Regulation
+  legal_ref: "COM(2025) 990 / 2025/0418(COD)"
+  dg: TAXUD
+  category: [carbon_pricing_trade, funding_support]
+  steel_relevance: medium
+  summary: >
+    CBAM 대상 제품(철강·알루미늄·비료 등)을 생산·수출하는 EU 생산자의 잔여 탄소누출 위험에 대응해
+    ETS 탄소비용 일부를 한시 지원하는 기금 신설 규정안. 2025.12.17 Commission 제안(CBAM 하류 확대안과 함께),
+    재원은 회원국의 2026·2027년 CBAM 관련 수입 일부. 유럽의회는 2026.9.15 1독 입장을 채택했으나 이사회 입장은 아직 없다.
+  requirements:
+    - type: trade_measure
+      text: EU 역내 CBAM 대상 제품 생산·수출자의 탄소비용 일부 보전(Commission안 2028~2029년 지원, 의회안 2027~2029년)
+    - type: mrv
+      text: 지원 조건으로 탈탄소 노력 입증(의회는 기후중립 계획 등 조건 강화 요구)
+  scope: "EU 역내 CBAM 대상 제품 생산 설비 운영자 및 (의회안) 해당 제품을 주원료로 쓰는 하류 운영자"
+  milestones:
+    - date: 2025-12-17
+      label: Commission 제안 COM(2025) 990
+    - date: 2026-07-06
+      label: 유럽의회 ENVI 위원회 표결
+    - date: 2026-09-15
+      label: 유럽의회 본회의 1독 입장 채택, 협상 위해 위원회 회부
+  consultations: []
+  impact:
+    eu_producers:
+      level: medium
+      obligations: 지원 신청 시 탈탄소 조건 충족
+      opportunities: 역외 수출 시 탄소비용 부담 일부 보전으로 수출 경쟁력 유지
+    non_eu_producers:
+      level: low
+      obligations: 직접 의무 없음
+      costs: 제3국 시장에서 EU 철강과의 경쟁 조건 변화(간접 영향)
+    korea_note: >
+      한국 철강사에 직접 의무는 없지만, EU 철강사의 역외 수출 비용이 보전되면 제3국 시장에서 EU산과의 경쟁 조건이 달라질 수 있다.
+      기금은 한시 조치이며 근본적 수출 해법은 ETS 검토 등 후속 논의로 넘어가 있으므로 ETS 무상할당·수출 조정 논의와 함께 모니터링하면 된다.
+  links:
+    commission: "https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism/cbam-legislation-and-guidance_en"
+    eurlex: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:52025PC0990"
+    oeil: "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2025/0418(COD)"
+  related: [cbam, cbam_downstream, ets_review]
+  verify_needed: true
+  note: >
+    seed의 '수출 관련 조치'를 실제 제안인 임시 탈탄소 기금(TDF)으로 재정의함. 2025.12 패키지에 별도 '수출 조정' 법안은 확인되지 않음.
+    이사회 입장·트릴로그 일정 미확인. TDF 전용 Have Your Say 페이지는 찾지 못함. EUR-Lex CELEX 52025PC0990 링크는 번호 체계로 구성(직접 열람 못 함).
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# cbam_secondary_acts 출처:
+#  - Commission 법령 페이지(채택된 이행·위임법령 번호): https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism/cbam-legislation-and-guidance_en
+#  - Have Your Say API (brpapi/groupInitiatives/{ID}):
+#    14830 제3국 탄소가격: CfE ~2025.9.25(145건), 초안 2026.5.13~6.10(177건), 채택 예정 Q1 2026(미채택)
+#    14132 인증서 판매·환매 위임법령: 초안 2026.7.9~8.6(93건), 채택 예정 Q2 2026(미채택)
+#    16932 CBAM 신고 이행법령: 계획 2026.2.19 게시, 채택 예정 Q4 2026, 초안 피드백 '예정'
+#    16933 ETS 벤치마크 반영 조정 이행법령: 계획 2026.2.19 게시, 채택 예정 Q4 2026, 초안 피드백 '예정'
+#    14828·14829 CfE 2025.8.28~9.25 (산정방법, 무상할당 조정)
+#    15132 CBAM 등록부 이행법령 개정: 계획 2025.10.9 게시
+#  - CBAM Q&A (2026.10.15): 원산지 탄소가격 공제 이행법령 2026년 채택 계획
+# ------------------------------------------------------------
+- id: cbam_secondary_acts
+  name_ko: CBAM 이행·위임법령 (기본값·벤치마크·탄소가격 공제·인증서 판매 등)
+  name_en: CBAM implementing and delegated acts (default values, benchmarks, carbon price paid, certificates)
+  status: pending
+  stage: consultation
+  legal_form: Implementing Act
+  dg: TAXUD
+  category: [carbon_pricing_trade]
+  steel_relevance: high
+  summary: >
+    CBAM 확정기간 운영 세부 규칙을 정하는 하위 법령군. 산정방법·검증·기본값·벤치마크 등 핵심 법령은 2025.12 채택되었고
+    (기본값은 2026/1740으로 정정), 제3국 탄소가격 공제(초안 피드백 2026.6.10 마감), 인증서 판매·환매 위임법령(2026.8.6 마감)은
+    채택 대기 중이다. CBAM 신고 및 ETS 2026~2030 벤치마크 반영 이행법령은 2026년 4분기 채택이 계획되어 있다.
+  requirements:
+    - type: carbon_footprint
+      text: 내재배출량 산정방법(2025/2547)과 국가별 기본값(2025/2621, 2026/1740 정정) 적용
+    - type: mrv
+      text: 검증 원칙(2025/2546)과 검증기관 인정(2025/2551)
+    - type: certificate
+      text: 제3국 납부 탄소가격의 인증서 공제 환산·증빙(제정 중), 인증서 판매·환매 조건(제정 중), 무상할당 조정 벤치마크(2025/2620, ETS 2026~2030 벤치마크 반영 개정 예정)
+  scope: "CBAM 대상 전 품목(철강 포함)의 산정·검증·신고·인증서 세부 규칙"
+  sub_acts:
+    - "채택: 2025/2546(검증 원칙), 2025/2547(산정방법), 2025/2548(인증서 가격), 2025/2551(인정·검증, 위임), 2025/2620(무상할당 조정·벤치마크), 2025/2621(기본값), 2026/1740(기본값 정정)"
+    - "제정 중: 제3국 납부 탄소가격 이행법령(HYS 14830), 인증서 판매·환매 위임법령(HYS 14132)"
+    - "계획: CBAM 신고 이행법령(HYS 16932), ETS 벤치마크 반영 조정 이행법령(HYS 16933), CBAM 등록부 이행법령 개정(HYS 15132)"
+  milestones:
+    - date: 2025-09-25
+      label: 산정방법·무상할당 조정·제3국 탄소가격 Call for Evidence 마감
+    - date: 2026-02-19
+      label: CBAM 신고·벤치마크 조정 이행법령 계획 게시
+    - date: 2026-06-10
+      label: 제3국 탄소가격 공제 이행법령 초안 피드백 마감
+    - date: 2026-08-06
+      label: 인증서 판매·환매 위임법령 초안 피드백 마감
+    - date: 2026-08-10
+      label: 확정기간 기본값(정보용 Excel) 갱신 게시
+  consultations:
+    - type: call_for_evidence
+      title: "Carbon border adjustment mechanism (CBAM) methodology for the definitive period"
+      start: 2025-08-28
+      end: 2025-09-25
+      summary: 확정기간 내재배출량 산정방법 이행법령에 대한 의견 수렴
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14828_en"
+    - type: call_for_evidence
+      title: "Adjustment of the obligation to surrender CBAM certificates to take account of ETS free allowances phase-out"
+      start: 2025-08-28
+      end: 2025-09-25
+      summary: ETS 무상할당 단계 폐지를 반영한 인증서 제출 의무 조정(벤치마크) 방식에 대한 의견 수렴
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14829_en"
+    - type: call_for_evidence
+      title: "Carbon price paid in a third country under the carbon border adjustment mechanism (CBAM)"
+      start: 2025-08-28
+      end: 2025-09-25
+      summary: 제3국에서 실제 납부한 탄소가격을 인증서 수로 환산하는 규칙에 대한 의견 수렴(145건)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14830_en"
+    - type: draft_act_feedback
+      title: "Carbon price paid in a third country under the carbon border adjustment mechanism (CBAM)"
+      start: 2026-05-13
+      end: 2026-06-10
+      summary: 제3국 납부 탄소가격 공제 이행법령 초안 — 환산 방식, 무상할당 등 보상 차감, 납부 증빙과 독립 인증 요건(177건)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14830_en"
+    - type: draft_act_feedback
+      title: "Sale and repurchase of CBAM certificates"
+      start: 2026-07-09
+      end: 2026-08-06
+      summary: CBAM 인증서의 판매·환매 조건을 정하는 위임법령 초안(93건)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14132_en"
+  impact:
+    eu_producers:
+      level: low
+      obligations: 직접 의무 없음
+    non_eu_producers:
+      level: high
+      obligations: 개정되는 산정·검증 규칙에 맞춘 배출량 데이터 제공
+      preparation: 기본값·벤치마크 개정 반영, 원산지 탄소가격 납부 증빙 체계
+      opportunities: 원산지 탄소가격 공제 인정 시 수입자 부담 감소
+    korea_note: >
+      한국 철강사에 가장 직접적인 하위 법령은 제3국 탄소가격 공제 이행법령이다. K-ETS 납부분이 공제되려면 무상할당 등 보상분 차감 후
+      '실제 납부' 가격과 증빙·독립 인증이 필요하므로, 최종 채택 문안의 증빙 형식에 맞춰 설비·제품별 K-ETS 납부 내역을 정리해야 한다.
+      한국산 열연·냉연·도금·스테인리스 기본값(2026/1740 정정 반영)과 ETS 2026~2030 벤치마크 반영 개정(2026년 4분기 계획)도 수입자 부담에 영향을 주므로 확인이 필요하다.
+  links:
+    commission: "https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism/cbam-legislation-and-guidance_en"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14830_en"
+  related: [cbam]
+  verify_needed: true
+  note: >
+    채택 법령의 채택·관보 일자는 EUR-Lex 직접 확인 못 함(번호·주제는 Commission 페이지 기준). 14830(계획 Q1 2026)·14132(계획 Q2 2026)는 계획 시기가 지났으나
+    2026.10.27 기준 HYS상 채택 기록 없음. 16932·16933 초안 피드백 기간은 아직 공지되지 않음(예정). 2025.9 마감 CfE 3건은 약 13개월 전 마감 건으로 이력 참고용.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# steel_trade_measure 출처:
+#  - OEIL 2025/0726(COD): https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2025/0726(COD)
+#    (COM(2025)726 2025.10.7, INTA 표결 2026.1.27, 합의안 위원회 승인 2026.5.6, 본회의 2026.5.19 T10-0170/2026,
+#     이사회 채택 2026.6.8, 서명 2026.6.17, 관보 2026.6.24, Reg. 2026/1384)
+#  - Commission(Access2Markets): https://trade.ec.europa.eu/access-to-markets/en/news/new-eu-safeguards-steel-imports-third-countries
+#    (1,830만t, 50% 관세, 부속서 I 30개 품목군, 2026.7.1 적용, 2019/159 대체)
+#  - Council 합의 보도자료(2026.4.13): https://www.consilium.europa.eu/en/press/press-releases/2026/04/13/council-and-european-parliament-strike-deal-to-protect-eu-s-steel-industry-from-global-overcapacity/ (자동 조회 403, 제목 확인)
+#  - 조문 요약(EUR-Lex 원문 미러): https://lawplayer.com/eu/act/32026R1384 (제14조 적용일, 제4조 melt and pour, 제12조 검토, 제8조 1,440만~2,220만t 범위)
+#  - Have Your Say 14781 (API): CfE 2025.7.18~8.18(143건), 제안 피드백 2025.10.10~12.16(80건): https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14781_en
+#  - 국가별 쿼터 배분 IR 2026/1457 (2026.6.29): https://eur-lex.europa.eu/eli/reg_impl/2026/1457/oj
+#  - melt and pour 증빙 IR 2026/1963 (2026.8.28, 관보 2026.8.31, Mill Test Certificate): https://eur-lex.europa.eu/eli/reg_impl/2026/1963/oj/eng (검색 결과 메타데이터 기준)
+# ------------------------------------------------------------
+- id: steel_trade_measure
+  name_ko: 철강 과잉설비 대응 무역조치 (세이프가드 대체 규정)
+  name_en: Regulation addressing the negative trade-related effects of global overcapacity on the Union steel market
+  status: in_force
+  stage: adopted
+  legal_form: Regulation
+  legal_ref: "Regulation (EU) 2026/1384"
+  dg: TRADE
+  category: [carbon_pricing_trade]
+  steel_relevance: high
+  effective_date: 2026-07-01
+  summary: >
+    2026.6.30 만료된 철강 세이프가드(Implementing Reg. 2019/159)를 대체하는 상설 수입 조치. 30개 철강 품목군에
+    연간 무관세 쿼터 총 18,345,922톤(2024년 대비 약 47% 축소)을 설정하고 쿼터 초과분에 50% 종가세를 부과한다.
+    2026.10.1부터 수입 시 용해·주조(melt and pour) 국가 증빙(Mill Test Certificate)을 요구한다.
+    2025.10.7 제안, 2026.6.17 서명, 2026.6.24 관보 게재, 2026.7.1 적용.
+  requirements:
+    - type: trade_measure
+      text: 30개 품목군 국가별·잔여 관세할당(TRQ) 연간 18,345,922톤, 분기별 운영, 쿼터 초과분 50% 종가세
+    - type: trade_measure
+      text: 2026.10.1부터 수입 시 melt and pour 국가와 heat number가 기재된 Mill Test Certificate 제출(IR 2026/1963)
+    - type: trade_measure
+      text: 국가별 쿼터 배분은 이행규정(IR 2026/1457)으로 결정, 2027.10.1부터 melt and pour 데이터를 배분에 반영
+  scope: "부속서 I의 30개 철강 품목군(CN 코드 지정), 아이슬란드·리히텐슈타인·노르웨이산 제외"
+  sub_acts:
+    - "Implementing Regulation (EU) 2026/1457 (국가별 관세할당 배분, 2026.6.29)"
+    - "Implementing Regulation (EU) 2026/1963 (melt and pour 증빙 유형, 2026.8.28)"
+  milestones:
+    - date: 2025-10-07
+      label: Commission 제안 COM(2025) 726
+    - date: 2025-12-16
+      label: Have Your Say 제안서 피드백 마감
+    - date: 2026-04-13
+      label: 이사회·유럽의회 정치적 합의
+    - date: 2026-05-19
+      label: 유럽의회 1독 채택
+    - date: 2026-06-08
+      label: 이사회 채택
+    - date: 2026-06-24
+      label: 관보 게재(Reg. (EU) 2026/1384)
+    - date: 2026-06-30
+      label: 기존 철강 세이프가드 만료
+    - date: 2026-07-01
+      label: 신규 조치 적용 개시
+    - date: 2026-10-01
+      label: melt and pour 증빙 의무 적용
+    - date: 2026-12-31
+      label: 특정 CN 코드 추가 여부 평가 기한
+    - date: 2027-06-30
+      label: 하류 철강제품 포함 등 범위 확대 평가 기한, 첫 연간 쿼터기간 종료
+    - date: 2027-10-01
+      label: melt and pour 데이터를 국가별 쿼터 배분에 반영
+    - date: 2028-06-30
+      label: melt and pour 기준 쿼터 자격 전환 여부 평가·첫 이행 보고
+  consultations:
+    - type: call_for_evidence
+      title: "Trade measure addressing the negative trade-related effects of global excess capacity on the EU steel sector"
+      start: 2025-07-18
+      end: 2025-08-18
+      summary: 세이프가드 만료 후 과잉설비 대응 무역조치의 필요성과 설계(쿼터·관세 수준 등)에 대한 의견 수렴(143건)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14781_en"
+    - type: draft_act_feedback
+      title: "Trade measure addressing the negative trade-related effects of global excess capacity on the EU steel sector"
+      start: 2025-10-10
+      end: 2025-12-16
+      summary: Commission 규정안 COM(2025) 726에 대한 피드백(80건)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14781_en"
+  impact:
+    eu_producers:
+      level: medium
+      obligations: 직접 의무 없음
+      opportunities: 수입 물량 축소로 역내 공급·가격 보호, 가동률 회복 기대
+    non_eu_producers:
+      level: high
+      obligations: 국가별 쿼터 내 수출, 쿼터 소진 후 50% 관세, 수입 시 melt and pour 증빙 제공
+      costs: 쿼터 축소에 따른 수출 물량 감소와 쿼터 소진 시점 관리 부담
+      preparation: 품목군별 국가 쿼터·분기 소진 현황 모니터링, Mill Test Certificate에 melt and pour 국가·heat number 기재
+      opportunities: 국가별 쿼터를 확보한 공급국은 쿼터 미보유국 대비 상대적 접근성 유지
+    korea_note: >
+      열연·냉연·도금강판·스테인리스·강관 등 한국의 대EU 주력 수출품이 모두 쿼터 대상이다. 국가별 쿼터(IR 2026/1457)에서 한국 배정량과
+      분기별 소진 속도를 품목군별로 관리하고, 쿼터 초과 시 50% 관세가 붙으므로 고객사와 선적 시기를 조율해야 한다.
+      2026.10.1부터 Mill Test Certificate에 용해·주조 국가와 heat number 기재가 필수이므로, 수입 슬래브 등을 압연한 제품은 원산지 증빙을 분리 관리해야 한다.
+      2027.10.1부터 melt and pour 데이터가 쿼터 배분에 반영되고, 2027.6.30까지 하류제품 확대 여부가 평가되므로 후속 이행규정을 주시해야 한다.
+  links:
+    commission: "https://trade.ec.europa.eu/access-to-markets/en/news/new-eu-safeguards-steel-imports-third-countries"
+    eurlex: "https://eur-lex.europa.eu/eli/reg/2026/1384/oj"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14781_en"
+    oeil: "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2025/0726(COD)"
+  related: [cbam]
+  verify_needed: true
+  note: >
+    법령번호·입법 일정·적용일은 OEIL·Commission으로 확인. 남은 확인 사항: (1) IR 2026/1457의 적용 기간(2026.7~12 한정 여부)과 2027년 배분 후속 IR,
+    (2) 한국 품목별 배정량, (3) IR 2026/1963 채택·관보일(검색 메타데이터 기준), (4) 정치적 합의일 2026.4.13은 Council 보도자료 URL·제목 기준.
+    조문 세부(제12조 검토 일정 등)는 EUR-Lex 미러 기준이므로 원문 재대조 권장. melt and pour 증빙 관련 표적 협의는 HYS에 없음(2026.7.2 마감은 보조 출처만).
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# [신규] wsr_scrap_export_list 출처:
+#  - Have Your Say 14861 (API): 위임규정 초안 2026.9.18~10.16(161건), 채택 예정 Q4 2026, DG ENV:
+#    https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14861_en
+#  - Commission 폐기물 이동 페이지: https://environment.ec.europa.eu/topics/waste-and-recycling/waste-shipments_en
+#    (Reg. (EU) 2024/1157, 2024.5.20 발효, 대부분 2026.5.21 적용, 비OECD 수출규정 2027.5.21 적용)
+#  - 철 스크랩 영향 보도(위치 확인용): https://www.argusmedia.com/en/news-and-insights/latest-market-news/2880332-eu-proposes-scrap-export-restrictions-to-key-markets
+# ------------------------------------------------------------
+- id: wsr_scrap_export_list
+  name_ko: 폐기물 이동 규정 — 비OECD 국가 비유해폐기물(스크랩) 수출 허용국 목록
+  name_en: Waste Shipment Regulation – list of non-OECD countries authorised to import certain non-hazardous waste from the EU
+  status: pending
+  stage: consultation
+  legal_form: Delegated Act
+  legal_ref: "Regulation (EU) 2024/1157 위임규정(초안)"
+  dg: ENV
+  category: [carbon_pricing_trade]
+  steel_relevance: medium
+  summary: >
+    개정 폐기물 이동 규정(Reg. (EU) 2024/1157)에 따라 2027.5.21부터 비OECD 국가로의 비유해(그린리스트) 폐기물 수출이 원칙적으로 금지되며,
+    환경적으로 건전한 관리를 입증한 국가만 수입이 허용된다. 이 위임규정은 허용국 목록을 정하며, 철 스크랩의 역외 유출과 EU 내 스크랩 가용성에 영향을 준다.
+    초안 피드백은 2026.10.16 마감되었고 2026년 4분기 채택이 계획되어 있다.
+  requirements:
+    - type: trade_measure
+      text: 2027.5.21부터 목록에 없는 비OECD 국가로 철 스크랩 등 비유해 폐기물 수출 금지
+  scope: "EU에서 비OECD 국가로 수출되는 비유해(그린리스트) 폐기물, 철 스크랩 포함"
+  milestones:
+    - date: 2024-05-20
+      label: Reg. (EU) 2024/1157 발효
+    - date: 2026-10-16
+      label: 허용국 목록 위임규정 초안 피드백 마감
+    - date: 2027-05-21
+      label: 비OECD 국가 비유해폐기물 수출 규정 적용
+  consultations:
+    - type: draft_act_feedback
+      title: "List of non-OECD countries that are authorized to import certain non-hazardous waste from the EU"
+      start: 2026-09-18
+      end: 2026-10-16
+      summary: 비OECD 국가 중 EU 비유해 폐기물 수입을 허용할 국가 목록 초안에 대한 피드백(161건)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14861_en"
+  impact:
+    eu_producers:
+      level: medium
+      obligations: 직접 의무 없음(스크랩 수출업자는 수출 제한 적용)
+      opportunities: 역내 철 스크랩 공급 확대로 전기로 원료 확보 유리
+    non_eu_producers:
+      level: low
+      obligations: 목록 미포함 비OECD 국가는 EU산 스크랩 수입 불가
+      costs: 비OECD 스크랩 수입국 제강사의 원료 조달 비용 상승 가능
+    korea_note: >
+      한국은 OECD 회원국이라 비OECD 대상 수출 금지가 직접 적용되지 않는다. 다만 EU 스크랩의 비OECD 유출이 줄면
+      국제 철 스크랩 수급·가격이 달라질 수 있어 전기로 원료 조달과 저탄소 철강 전환 계획에 참고가 필요하다.
+  links:
+    commission: "https://environment.ec.europa.eu/topics/waste-and-recycling/waste-shipments_en"
+    eurlex: "https://eur-lex.europa.eu/eli/reg/2024/1157/oj"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14861_en"
+  related: [steel_trade_measure]
+  verify_needed: true
+  note: >
+    신규 추가 후보. 초안에서 제외된 국가(이집트·인도·파키스탄 등 보도)는 업계 보도 기준이며 공식 초안 문서는 직접 확인하지 못함.
+    채택 일자 미정(HYS 계획 Q4 2026).
+  last_verified: 2026-10-27
+
+# ============================================================
+# 출처 조사 파일: research_ets_climate
+# ============================================================
+# EU 철강 관련 ETS·기후·산업배출·수소 정책 조사 결과 (2026-10-27 기준)
+# 대상: eu_ets, ets_review, climate_law_2040, ied, steel_bref, red3 + 신규 후보 4건
+#
+# 공통 참고:
+# - Have Your Say 기간·제목은 공식 API(https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/{id})에서
+#   2026-10-27에 직접 조회한 값. HYS URL의 slug는 이니셔티브 제목으로 구성(14549는 검색 결과에서 확인된 실제 slug,
+#   나머지는 같은 규칙으로 구성: 이니셔티브 ID로 연결됨).
+# - EUR-Lex(eur-lex.europa.eu)는 이번 조사 환경에서 본문 조회가 차단되어, 관보 문서는 Commission/Council 사본 PDF와
+#   OEIL로 교차확인함.
+
+# ------------------------------------------------------------
+# [eu_ets] 출처:
+# - https://climate.ec.europa.eu/areas-action/carbon-markets/about-eu-ets_en
+# - https://climate.ec.europa.eu/areas-action/carbon-markets/eu-emissions-trading-system-eu-ets/free-allocation_en
+# - COM(2026) 616 본문(현행 CBAM factor 비교용): https://climate.ec.europa.eu/document/download/c0b4ca8e-0e12-4b4e-9976-98c0b4224410_en
+# - Implementing Regulation (EU) 2026/1412 (OJ L 29.6.2026) 사본: https://www.afec.es/documentos/english/regulation-2026-1412.pdf
+# - HYS 15873 (벤치마크): https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/15873
+# - HYS 13911 (기후중립계획 이행규칙 C(2023)7298): https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/13911
+# ------------------------------------------------------------
+- id: eu_ets
+  name_ko: EU 배출권거래제
+  name_en: EU Emissions Trading System (EU ETS)
+  status: in_force
+  stage: adopted
+  legal_form: Directive
+  legal_ref: "Directive 2003/87/EC (Directive (EU) 2023/959 등으로 개정)"
+  dg: CLIMA
+  category: [carbon_pricing_trade]
+  steel_relevance: high
+  effective_date: 2005-01-01
+  summary: >
+    EU 역내 고로·전기로·코크스·소결 설비 등 대규모 배출시설에 배출 상한(cap)을 두고 배출권을 거래하는 제도.
+    현행법(2023/959 개정)상 CBAM 대상 품목(철강 포함)의 무상할당은 CBAM factor에 따라 2026년 97.5%에서
+    2034년 0%로 단계적으로 줄어든다. 2026~2030 무상할당 벤치마크는 Implementing Regulation (EU) 2026/1412로
+    확정됐다(2026-06-30 발효). 2031년 이후 체계는 2026-07-17 Commission 개정안(ets_review)에서 논의 중이다.
+  requirements:
+    - type: mrv
+      text: 설비별 배출량 모니터링 계획 수립, 연간 배출량 보고 및 제3자 검증(MRR·AVR)
+    - type: certificate
+      text: 매년 검증된 전년도 배출량만큼 배출권 제출(제출 기한 9월 30일)
+    - type: bat_limits
+      text: "무상할당은 제품 벤치마크(2026~2030 값: 고로 용선 1.248, 코크스 0.143, 소결광 0.086, 전기로 탄소강 0.142, 전기로 고합금강 0.176 배출권/t) × 과거 활동량 기준"
+    - type: mrv
+      text: 에너지감사 권고 미이행 또는 (해당 설비) 기후중립계획 미수립 시 무상할당 20% 감액 조건(Art.10a(1))
+  scope: "EU·EEA 역내 철강 생산시설(코크스, 소결, 선철·조강, 전기로, 압연·열처리 등 연소설비 포함)"
+  sub_acts:
+    - "Commission Implementing Regulation (EU) 2026/1412 — 2026~2030 무상할당 벤치마크 값 (2026-06-26 채택, OJ 2026-06-29)"
+    - "Commission Delegated Regulation (EU) 2019/331 (무상할당 규칙, FAR) — Delegated Regulation (EU) 2024/873으로 개정(수소 직접환원 철강을 hot metal 벤치마크에 포함)"
+    - "기후중립계획 내용·형식 이행규칙 C(2023)7298 (2023-10-31 채택)"
+    - "Monitoring and Reporting Regulation (EU) 2018/2066, Accreditation and Verification Regulation (EU) 2018/2067"
+  milestones:
+    - date: 2026-01-01
+      label: "CBAM 대상 부문 CBAM factor 97.5% 적용 시작(무상할당 2.5% 감축)"
+    - date: 2026-06-30
+      label: 2026~2030 벤치마크 이행규칙 (EU) 2026/1412 발효
+    - date: 2026-09-30
+      label: 2025년 배출량에 대한 배출권 제출 기한
+    - date: 2027-01-01
+      label: CBAM factor 95%
+    - date: 2028-01-01
+      label: "CBAM factor 90%, 선형감축률(LRF) 4.3%→4.4%"
+    - date: 2030-01-01
+      label: "CBAM factor 51.5% (현행법 기준)"
+    - date: 2034-01-01
+      label: "CBAM 대상 부문 무상할당 완전 폐지(CBAM factor 0%, 현행법 기준 — 개정안은 2038년으로 연장 제안)"
+  consultations:
+    - type: draft_act_feedback
+      title: "COMMISSION IMPLEMENTING REGULATION (EU) …/... determining revised benchmark values for free allocation of emission allowances for the period from 2026 to 2030"
+      start: 2026-05-11
+      end: 2026-06-08
+      summary: 2026~2030 무상할당 벤치마크 값 초안 의견수렴(442건). 철강 벤치마크 대부분이 2021~2025 대비 하향. 최종본은 (EU) 2026/1412로 채택.
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/15873-Revision-of-the-benchmark-values-for-free-allocation-of-emission-allowances-2026-2030-_en"
+  impact:
+    eu_producers:
+      level: high
+      obligations: 배출량 MRV, 매년 배출권 제출, 무상할당 조건(에너지감사·기후중립계획) 준수
+      costs: 2026~2030 벤치마크 하향과 CBAM factor 축소로 무상할당 감소, 탄소비용 부담 증가
+      preparation: 저탄소 공정(수소 DRI·전기로) 전환 투자와 배출권 조달·헤지 전략 수립
+      opportunities: Innovation Fund 등 ETS 재원 기반 탈탄소 지원 활용
+    non_eu_producers:
+      level: medium
+      obligations: ETS 직접 의무 없음. 단 CBAM 인증서 가격·무상할당 조정이 ETS 가격·벤치마크와 연동
+      costs: ETS 벤치마크·CBAM factor가 CBAM 인증서 차감(무상할당 반영분) 규모를 결정해 간접 영향
+      preparation: ETS 벤치마크 값과 CBAM factor 일정 모니터링
+    korea_note: >
+      한국 철강사는 ETS 직접 적용 대상이 아니지만, CBAM 인증서 가격이 ETS 배출권 가격에 연동되고 CBAM 인증서 의무량은
+      ETS 무상할당(벤치마크 × CBAM factor) 만큼 조정된다. 2026~2030 벤치마크(고로 용선 1.248 등) 하향과 CBAM factor
+      축소 일정은 EU 수출품의 CBAM 부담을 결정하는 핵심 변수이므로, 제품별 내재배출량을 EU 벤치마크와 비교·관리할 필요가 있다.
+  links:
+    commission: "https://climate.ec.europa.eu/areas-action/carbon-markets/about-eu-ets_en"
+    eurlex: "https://eur-lex.europa.eu/eli/dir/2003/87/oj"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/15873-Revision-of-the-benchmark-values-for-free-allocation-of-emission-allowances-2026-2030-_en"
+    guidance: "https://climate.ec.europa.eu/areas-action/carbon-markets/eu-emissions-trading-system-eu-ets/free-allocation_en"
+  related: [cbam, ets_review, ets_benchmarks_2026_2030, climate_law_2040]
+  verify_needed: false
+  note: >
+    현행 CBAM factor 일정(2026 97.5%, 2027 95%, 2028 90%, 2029 77.5%, 2030 51.5%, 2031 39%, 2032 26.5%, 2033 14%, 2034 0%)은
+    Directive 2003/87/EC Art.10a(1a) 기준이며, EUR-Lex 통합본은 이번 조사에서 직접 조회하지 못함(조회 차단).
+    기후중립계획 이행규칙의 관보 번호는 확인하지 못해 C(2023)7298로 표기.
+    무상할당 20% 감액 조건(Art.10a(1))은 이번 조사에서 원문 재확인하지 못함.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# [ets_review] 출처:
+# - COM(2026) 616 본문(2026/0212(COD)): https://climate.ec.europa.eu/document/download/c0b4ca8e-0e12-4b4e-9976-98c0b4224410_en
+#   (EUR-Lex 리다이렉트: https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=COM:2026:616:FIN)
+# - COM(2026) 620 Council 송부문(2026/0210(COD)): https://data.consilium.europa.eu/doc/document/ST-12074-2026-INIT/en/pdf
+# - OEIL: https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2026/0212(COD)
+# - HYS API 14549: https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/14549
+# - Commission ETS 페이지: https://climate.ec.europa.eu/areas-action/carbon-markets/about-eu-ets_en
+# - Commission 보도자료: https://ec.europa.eu/commission/presscorner/detail/en/ip_26_1596
+# - ICAP 요약(LRF 수치 참고): https://icapcarbonaction.com/en/news/eu-commission-publishes-eu-ets-review-proposal
+# - 환경이사회 2026-10-12 정책토론: https://www.consilium.europa.eu/es/meetings/env/2026/10/12/
+# - MSR 무효화 중단안 COM(2026) 153 Council 입장(2026-09-23): https://www.consilium.europa.eu/en/press/press-releases/2026/09/23/market-stability-reserve-council-agrees-targeted-amendment-for-a-resilient-and-predictable-carbon-market/
+# ------------------------------------------------------------
+- id: ets_review
+  name_ko: EU ETS 개정안 (2031~2040 체계, 경쟁력·비용효율적 탈탄소)
+  name_en: "EU ETS review — Directive amending Directive 2003/87/EC and Decision (EU) 2015/1814 as regards driving competitiveness and cost-effective decarbonisation"
+  status: pending
+  stage: proposal
+  legal_form: Directive
+  legal_ref: "COM(2026) 616 final, 2026/0212(COD)"
+  dg: CLIMA
+  category: [carbon_pricing_trade, funding_support]
+  steel_relevance: high
+  summary: >
+    Commission이 2026-07-17 제안한 ETS 지침 개정안. 2040년 -90% 목표에 맞춘 2031~2040 상한·선형감축률,
+    무상할당·탄소누출 보호의 2040년까지 연장, 2031년부터 모든 무상할당을 'Invest in EU 탈탄소계획'에 연동(80%는 계획 승인 시,
+    20%는 감축 실적 확인 후 지급), CBAM 부문 무상할당 폐지 일정 완화(2028년부터 폐지분의 15% 재도입, 완전 폐지 2034→2038년),
+    산업탈탄소은행(Industrial Decarbonisation Bank, 2028년~) 신설 등을 담았다. 의회 ENVI 위원회 검토 단계이며,
+    Council은 2026-10-12 환경이사회에서 정책토론을 진행했다.
+  requirements:
+    - type: certificate
+      text: "CBAM factor 수정안: 2028 91.5%, 2029 81%, 2030 59%, 2031 48%, 2032 37.5%, 2033 27%, 2034~2037 15%, 2038년부터 0%"
+    - type: mrv
+      text: "무상할당 신청 설비는 'Invest in EU 탈탄소계획'(2050 기후중립 정합, 2035년부터 5년 단위 중간목표) 수립·공개·검증; 기존 설비는 2029-09-30까지 제출"
+    - type: certificate
+      text: "2031년부터 무상할당 80%는 검증·승인된 계획 제출 시, 나머지 20%는 5년 기간 말 감축 실적 확인 시 지급. 생산 역외이전 시 배출권 반환"
+    - type: bat_limits
+      text: 2031~2035, 2036~2040 벤치마크 갱신 규칙 신설(현행 방법론 연장), 교차부문 조정계수 버퍼 4%로 확대
+  scope: "EU ETS 적용 고정설비(철강 포함), 항공·해운, 비유해 폐기물 소각(3t/h 초과) 신규 편입"
+  sub_acts:
+    - "COM(2026) 619 / 2026/0211(COD) — 2026~2030 열·연료 fallback 벤치마크 상향 Regulation 제안 (ets_benchmarks_2026_2030 참고)"
+    - "COM(2026) 620 / 2026/0210(COD) — MRV 간소화 Regulation 제안 (Regulation (EU) 2015/757, (EU) 2023/1805 개정)"
+    - "COM(2026) 153 — MSR 무효화(400백만 초과분) 중단 Decision 개정안 (2026-04-01 제안, Council 협상입장 2026-09-23)"
+  milestones:
+    - date: 2025-04-14
+      label: Call for Evidence 개시 (2025-07-08 마감)
+    - date: 2026-05-12
+      label: ETS 검토 고위급 이해관계자 라운드테이블
+    - date: 2026-07-17
+      label: Commission 개정안 COM(2026) 616 채택
+    - date: 2026-09-04
+      label: 유럽의회 ENVI 보고관(Peter Liese) 지명
+    - date: 2026-10-12
+      label: 환경이사회 정책토론
+    - date: 2026-11-03
+      label: 개정안 Have Your Say 피드백 마감
+    - date: 2026-12-14
+      label: 유럽의회 1독회 본회의 예정일(OEIL 예측, 잠정)
+    - date: 2028-12-31
+      label: "회원국 국내법 전환 기한(제안 기준, 적용 2029-01-01)"
+    - date: 2031-01-01
+      label: 무상할당 탈탄소계획 연동·제5기(2031~2040) 개시(제안 기준)
+  consultations:
+    - type: call_for_evidence
+      title: "Legislative proposal for a Directive of the European Parliament and of the Council amending Directive 2003/87/EC, Decision (EU) 2015/1814 and Regulation (EU) 2015/757 on certain elements of the EU Emissions Trading System (EU ETS) and of its Market Stability Reserve (MSR), relating to stationary installations, aviation and maritime"
+      start: 2025-04-14
+      end: 2025-07-08
+      summary: ETS·MSR 검토 방향(탄소누출, 무상할당, 범위 확대, 탄소제거 등)에 대한 영향평가 Call for Evidence (377건)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14549-EU-emissions-trading-system-for-maritime-aviation-and-stationary-installations-and-market-stability-reserve-review_en"
+    - type: public_consultation
+      title: "Open public consultation concerning the review of ETS1"
+      start: 2025-04-15
+      end: 2025-07-08
+      summary: ETS1 검토 공개협의 설문(535건)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14549-EU-emissions-trading-system-for-maritime-aviation-and-stationary-installations-and-market-stability-reserve-review/public-consultation_en"
+    - type: draft_act_feedback
+      title: "Proposal for a DIRECTIVE OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL amending Directive 2003/87/EC and Decision (EU) 2015/1814 as regards driving competitiveness and cost-effective decarbonisation"
+      start: 2026-08-25
+      end: 2026-11-03
+      summary: 채택된 ETS 개정안 COM(2026) 616에 대한 피드백(진행 중)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14549-EU-emissions-trading-system-for-maritime-aviation-and-stationary-installations-and-market-stability-reserve-review_en"
+    - type: draft_act_feedback
+      title: "Proposal for a REGULATION OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL amending Regulations (EU) 2015/757 and (EU) 2023/1805 to simplify and streamline monitoring, reporting and verification and to align with revisions of the EU Emissions Trading System"
+      start: 2026-08-20
+      end: 2026-11-03
+      summary: ETS 개정에 맞춘 MRV 간소화 Regulation 제안 COM(2026) 620 피드백(진행 중)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14549-EU-emissions-trading-system-for-maritime-aviation-and-stationary-installations-and-market-stability-reserve-review_en"
+  impact:
+    eu_producers:
+      level: high
+      obligations: 2031년부터 무상할당을 받으려면 탈탄소 투자계획 수립·검증·이행 및 감축 실적 입증 필요
+      costs: CBAM 부문 무상할당 폐지 속도 완화로 2028~2037년 단기 부담 완화, 대신 무상할당이 투자 이행 조건부로 전환
+      preparation: 2029-09-30 계획 제출(제안 기준) 대비 설비별 투자·감축 로드맵 마련
+      opportunities: 산업탈탄소은행·Investment Booster(400백만 배출권) 등 탄소차액계약·탄소프리미엄 지원
+    non_eu_producers:
+      level: medium
+      obligations: 직접 의무 없음. CBAM factor 수정 시 CBAM 인증서 의무량 산정에 반영
+      costs: 무상할당 폐지 연장(2038년) 시 CBAM 인증서 부담의 증가 속도가 현행보다 완만해짐(입법 결과에 따라 변동)
+      preparation: 의회·이사회 협상 결과와 CBAM factor 최종안 모니터링
+    korea_note: >
+      개정안이 채택되면 CBAM 대상 철강의 무상할당 폐지가 2034년에서 2038년으로 늦춰지고 2028~2037년 CBAM factor가 현행보다 높아져,
+      한국산 철강의 CBAM 인증서 부담 증가 속도도 현행법 대비 완만해질 수 있다. 반면 EU 철강사는 산업탈탄소은행 등 지원을 받아
+      저탄소 전환을 가속할 수 있어 중장기 경쟁 구도에 영향을 준다. 의회(보고관 Liese)·이사회 협상과 최종 CBAM factor 일정을
+      계속 추적할 필요가 있다.
+  links:
+    commission: "https://climate.ec.europa.eu/areas-action/carbon-markets/about-eu-ets_en"
+    eurlex: "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=COM:2026:616:FIN"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14549-EU-emissions-trading-system-for-maritime-aviation-and-stationary-installations-and-market-stability-reserve-review_en"
+    oeil: "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2026/0212(COD)"
+  related: [eu_ets, ets_benchmarks_2026_2030, climate_law_2040, cbam]
+  verify_needed: true
+  note: >
+    개정안 본문·절차번호·CBAM factor·탈탄소계획 조항·적용일은 COM(2026) 616 본문으로 확인. 선형감축률(2031~35 3.7%, 2036년~ 1.7%,
+    국제크레딧 부재 시 2036년~ 2.7%) 중 2.7%만 본문에서 직접 확인했고 3.7%·1.7%는 ICAP 요약 기준이라 summary에 넣지 않음.
+    COM(2026) 616 피드백 시작일은 HYS API publishedDate(2026-08-25) 기준. 이사회 '12월 합의 목표'는 의장국 발언 보도 기준으로 미확정.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# [climate_law_2040] 출처:
+# - Commission 기후법 페이지(Regulation (EU) 2026/667, 2026년 4월 발효): https://climate.ec.europa.eu/areas-action/european-climate-law_en
+# - Commission 2040 목표 페이지: https://climate.ec.europa.eu/areas-action/climate-strategies-targets/2040-climate-target_en
+# - 유럽의회 보도(2026-02-10 표결, 2025/0524(COD)): https://www.europarl.europa.eu/news/en/press-room/20260205IPR33620/eu-climate-law-a-2040-emissions-reduction-target-of-90-for-the-eu
+# - Council 보도(2026-03-05 최종 승인): https://www.consilium.europa.eu/en/press/press-releases/2026/03/05/2040-climate-target-council-gives-final-green-light/
+# - 관보 게재일(2026-03-18) 보조 출처: https://sustainablefutures.linklaters.com/post/102mne1/eu-regulation-on-2040-climate-target-published-in-the-official-journal-of-the-eu
+# - HYS API 14397, 16632: https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/14397 , .../16632
+# ------------------------------------------------------------
+- id: climate_law_2040
+  name_ko: 유럽기후법 개정 (2040년 -90% 목표)
+  name_en: European Climate Law amendment (2040 climate target)
+  status: in_force
+  stage: adopted
+  legal_form: Regulation
+  legal_ref: "Regulation (EU) 2026/667 (Regulation (EU) 2021/1119 개정)"
+  dg: CLIMA
+  category: [climate_framework]
+  steel_relevance: medium
+  effective_date: 2026-04-07
+  summary: >
+    2040년까지 순 온실가스 배출을 1990년 대비 90% 감축하는 법적 구속력 있는 목표를 기후법에 추가한 개정.
+    2036년부터 고품질 국제탄소크레딧을 최대 5%p까지 인정하고, ETS 대상 감축 곤란 배출 상쇄에 역내 영구 탄소제거 활용을 허용하며,
+    ETS2(건물·도로수송) 시행을 2027년에서 2028년으로 1년 연기했다. 2년마다 진척 검토 후 목표 조정 제안이 가능하다.
+    2026-07-17 ETS 개정안의 상한·선형감축률 설계 근거가 됐다.
+  requirements:
+    - type: mrv
+      text: "EU 전체 2040년 순배출 -90%(1990 대비) 법적 목표 — 철강 등 ETS 부문의 2031~2040 상한 설계 근거"
+    - type: certificate
+      text: 2036년부터 국제크레딧 최대 5%p 인정, 역내 영구 탄소제거로 ETS 잔여 배출 상쇄 허용(세부 규정은 후속 입법)
+  scope: "EU 전체(부문별 정책의 상위 목표). 철강에는 ETS 개정을 통해 간접 적용"
+  sub_acts:
+    - "국제탄소크레딧 활용 법적 체계 Regulation 제안(예정) — HYS 16632"
+    - "2030년 이후 회원국 감축목표·유연성 개정 Regulation 제안(예정) — HYS 16692"
+    - "ETS 개정안 COM(2026) 616 (ets_review)"
+  milestones:
+    - date: 2025-07-02
+      label: Commission 개정안 COM(2025) 524 채택
+    - date: 2026-02-10
+      label: 유럽의회 본회의 승인(찬성 413, 반대 226, 기권 12)
+    - date: 2026-03-05
+      label: Council 최종 승인
+    - date: 2026-03-18
+      label: 관보 게재
+    - date: 2026-04-07
+      label: 발효(관보 게재 후 20일)
+    - date: 2028-01-01
+      label: ETS2 시행 연기 후 시작 연도
+  consultations:
+    - type: draft_act_feedback
+      title: "Proposal for a REGULATION OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL amending Regulation (EU) 2021/1119 establishing the framework for achieving climate neutrality"
+      start: 2025-07-21
+      end: 2025-09-17
+      summary: 2040년 -90% 목표 개정안 COM(2025) 524에 대한 피드백(244건)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14397-European-Climate-Law-amendment_en"
+    - type: call_for_evidence
+      title: "Proposal establishing provisions for the use of international credits towards the European Union's GHG emissions target for 2040 under Regulation (EU) 2021/1119, the European Climate Law"
+      start: 2026-02-09
+      end: 2026-05-04
+      summary: 2040 목표에 국제탄소크레딧을 활용하기 위한 법적 체계(후속 입법) Call for Evidence (154건)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/16632-Legal-framework-for-the-possible-use-of-international-carbon-credits-towards-the-2040-EU-climate-law-target_en"
+    - type: public_consultation
+      title: "International Carbon Credits"
+      start: 2026-02-09
+      end: 2026-05-04
+      summary: 국제탄소크레딧 활용 체계 공개협의(220건)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/16632-Legal-framework-for-the-possible-use-of-international-carbon-credits-towards-the-2040-EU-climate-law-target_en"
+  impact:
+    eu_producers:
+      level: medium
+      obligations: 직접 의무 없음. ETS 상한 축소·무상할당 조건 강화의 법적 근거
+      costs: 2031년 이후 ETS 상한 경로를 통해 탄소비용 수준에 영향
+      preparation: 2040년 감축경로를 반영한 장기 투자계획 수립
+      opportunities: 영구 탄소제거·국제크레딧 활용 등 유연성 확대
+    non_eu_producers:
+      level: low
+      obligations: 직접 의무 없음
+      costs: ETS·CBAM 후속 개정을 통한 간접 영향
+      preparation: 후속 ETS·CBAM 개정 일정 추적
+    korea_note: >
+      2040년 -90% 목표가 법제화되면서 2031년 이후 EU ETS 상한 축소와 CBAM 유지가 사실상 확정된 방향이 됐다.
+      한국 철강사는 2030년 이후에도 EU 수출품에 탄소비용이 부과된다는 전제로 장기 저탄소 전환·내재배출량 관리 계획을 세울 필요가 있다.
+      국제크레딧(파리협정 제6조) 활용 규정이 마련되면 한-EU 간 크레딧 협력 논의 여지도 있다.
+  links:
+    commission: "https://climate.ec.europa.eu/areas-action/european-climate-law_en"
+    eurlex: "https://eur-lex.europa.eu/eli/reg/2026/667/oj"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14397-European-Climate-Law-amendment_en"
+    oeil: "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2025/0524(COD)"
+    guidance: "https://climate.ec.europa.eu/areas-action/climate-strategies-targets/2040-climate-target_en"
+  related: [ets_review, eu_ets, cbam]
+  verify_needed: true
+  note: >
+    채택·발효 확인(Commission 페이지: 'Regulation (EU) 2026/667', '2026년 4월 발효'). 관보 게재일 2026-03-18은 법률사무소 등 복수 출처,
+    발효일 2026-04-07은 '게재 후 20일' 규정으로 계산한 값으로, EUR-Lex 원문은 조회 차단으로 직접 확인하지 못함.
+    국제크레딧·회원국 목표 후속 Regulation 제안은 HYS상 'UPCOMING'으로 제안일 미정.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# [ied] 출처:
+# - Commission IED 2.0 페이지: https://environment.ec.europa.eu/topics/industrial-emissions-and-safety/industrial-and-livestock-rearing-emissions-directive-ied-20_en
+# - Directive 2010/75/EU 비공식 통합본(2024/1785 반영; Art.14a, 27d, 전환 조항): https://eipie.eu/wp-content/uploads/2025/06/Informal-revised-IED_consolidated.pdf
+# - 환경 옴니버스 COM(2025) 986 본문(2025/0394(COD)): https://environment.ec.europa.eu/document/download/b45b4ac2-7f40-4b82-acb3-815e134807b6_en?filename=COM_2025_986_1_EN_ACT_part1_v6.pdf
+# - OEIL 2025/0394(COD): https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2025/0394(COD)
+# - HYS API 14794, 16572: https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/14794 , .../16572
+# ------------------------------------------------------------
+- id: ied
+  name_ko: 산업·축산 배출지침 개정 (IED 2.0)
+  name_en: Industrial and Livestock Rearing Emissions Directive (IED 2.0)
+  status: in_force
+  stage: adopted
+  legal_form: Directive
+  legal_ref: "Directive (EU) 2024/1785 (Directive 2010/75/EU 개정)"
+  dg: ENV
+  category: [industrial_emissions]
+  steel_relevance: medium
+  effective_date: 2024-08-04
+  summary: >
+    최적가용기법(BAT)에 기반해 산업시설을 허가하는 지침의 개정. 2024-08-04 발효, 회원국 전환 기한 2026-07-01.
+    환경관리시스템(EMS) 의무화(2027-07-01까지), 철강 등 에너지집약 업종의 전환계획(Transformation plan) EMS 포함(2030-06-30까지),
+    가장 엄격한 달성 가능한 배출한도 설정, 위반 시 연매출 3% 이상 과징금 등을 도입했다.
+    다만 2025-12-10 Commission 환경 옴니버스(COM(2025) 986)가 전환계획 의무 삭제, EMS 기한 2030년 연기 등을 제안해 의회 심의 중이다.
+  requirements:
+    - type: bat_limits
+      text: BAT 결론에 따른 허가 조건 준수, 2026-07-01 이후 공표 BAT 결론부터 가장 엄격한 달성 가능 배출한도 적용
+    - type: mrv
+      text: "설비별 EMS 수립·이행 및 최초 감사(현행 기한 2027-07-01) — 옴니버스안은 2030년으로 연기 제안"
+    - type: mrv
+      text: "철강(Annex I 2항 금속) 등 지정 업종은 2030-06-30까지 EMS에 지표적 전환계획(2030~2050) 포함 — 옴니버스안은 삭제 제안"
+  scope: "EU 역내 철강 생산시설(선철·조강 2.5t/h 초과, 코크스, 소결 등 Annex I 활동)"
+  sub_acts:
+    - "환경 옴니버스 Directive 제안 COM(2025) 986 / 2025/0394(COD) — IED EMS·전환계획 등 간소화"
+    - "전환계획 내용 위임법령(Art.27d(5), 법정 채택기한 2026-06-30) — 채택 여부 미확인"
+    - "INCITE(산업전환·배출 혁신센터) 운영 이행결정 — 초안 의견수렴 예정(HYS 16572)"
+    - "철강 BAT 결론(Implementing Decision 2012/135/EU) 개정 작업 — steel_bref 참고"
+  milestones:
+    - date: 2024-08-04
+      label: 개정 지침 발효
+    - date: 2025-12-10
+      label: Commission 환경 옴니버스(COM(2025) 986) 제안 — IED 간소화 포함
+    - date: 2026-07-01
+      label: 회원국 국내법 전환 기한
+    - date: 2026-12-14
+      label: 옴니버스 유럽의회 1독회 본회의 예정일(OEIL 예측, 잠정)
+    - date: 2027-07-01
+      label: "EMS 수립·이행 및 최초 감사 기한(현행법)"
+    - date: 2030-06-30
+      label: "지정 업종 전환계획 EMS 포함 기한(현행법, 옴니버스안은 삭제 제안)"
+  consultations:
+    - type: call_for_evidence
+      title: "Proposals for a Regulation and for a Directive of the European Parliament and of the Council on the simplification of administrative burden in environmental legislation"
+      start: 2025-07-22
+      end: 2025-09-10
+      summary: 폐기물·제품·산업배출 분야 행정부담 간소화(환경 옴니버스) Call for Evidence
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14794-Simplification-of-administrative-burdens-in-environmental-legislation_en"
+    - type: draft_act_feedback
+      title: "COMMUNICATION FROM THE COMMISSION TO THE EUROPEAN PARLIAMENT, THE COUNCIL, THE EUROPEAN ECONOMIC AND SOCIAL COMMITTEE AND THE COMMITTEE OF THE REGIONS Simplifying for sustainable competitiveness"
+      start: 2026-03-12
+      end: 2026-05-07
+      summary: 환경 옴니버스 패키지(COM(2025) 980 및 IED 개정안 COM(2025) 986 등)에 대한 피드백(214건)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14794-Simplification-of-administrative-burdens-in-environmental-legislation_en"
+  impact:
+    eu_producers:
+      level: medium
+      obligations: 허가 조건·EMS 준수, (현행법 기준) 2030년까지 전환계획 수립
+      costs: BAT 결론 개정 시 설비 개선 투자, EMS 감사 비용
+      preparation: 옴니버스 협상 결과에 따른 EMS·전환계획 의무 변화 확인, 철강 BREF 개정 대응
+      opportunities: 심층 산업전환 시 허가조건 준수 기한 최대 8년 연장(Art.27e)
+    non_eu_producers:
+      level: low
+      obligations: 직접 의무 없음
+      costs: EU 경쟁사의 환경 규제비용 상승에 따른 간접 영향
+    korea_note: >
+      IED는 EU 역내 설비에만 적용되어 한국 철강사의 대EU 수출에는 직접 의무가 없다. 다만 EU 내 생산·가공 거점(합작·인수 포함)을
+      보유하거나 검토 중이라면 2026-07-01 이후 회원국 국내법, EMS 기한, 철강 BREF 개정에 따른 배출한도 강화를 고려해야 한다.
+      옴니버스로 전환계획 의무가 삭제될지 여부도 확인이 필요하다.
+  links:
+    commission: "https://environment.ec.europa.eu/topics/industrial-emissions-and-safety/industrial-and-livestock-rearing-emissions-directive-ied-20_en"
+    eurlex: "https://eur-lex.europa.eu/eli/dir/2024/1785/oj"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14794-Simplification-of-administrative-burdens-in-environmental-legislation_en"
+    oeil: "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2025/0394(COD)"
+  related: [steel_bref, ets_review]
+  verify_needed: true
+  note: >
+    전환 기한(2026-07-01)·EMS 기한(2027-07-01)·전환계획(2030-06-30, 위임법령 2026-06-30)은 비공식 통합본과 옴니버스 제안서 기준이며,
+    EUR-Lex 원문은 직접 조회하지 못함. 전환계획 위임법령 채택 여부, 회원국 전환 현황, 옴니버스(2025/0394(COD)) 이사회 입장은
+    미확인(OEIL상 '위원회 결정 대기'). 옴니버스 개별 제안서의 HYS 피드백은 비활성 상태이며, 피드백은 Communication(COM(2025) 980) 단위로 진행됨.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# [steel_bref] 출처:
+# - EU-BRITE(구 EIPPCB) BREF 뉴스(2026-03-06 TWG 재가동): https://bureau-industrial-transformation.jrc.ec.europa.eu/news/bref-news-160
+# - EU-BRITE 철강 BREF 참조 페이지: https://bureau-industrial-transformation.jrc.ec.europa.eu/reference/iron-and-steel-production-0
+# - EU-BRITE 메인(회의 일정 목록): https://bureau-industrial-transformation.jrc.ec.europa.eu/node/573
+# - 네덜란드 정부 IPLO BREF 일정표(킥오프 2026년 11~12월 계획, 비EU 출처): https://iplo.nl/regelgeving/regels-voor-activiteiten/toelichting-milieubelastende-activiteiten/vergunning-milieubelastende-activiteit/ippc/stand-komen-bref-bbt-conclusies/
+# - EEB 의견(2026-08): https://eeb.org/wp-content/uploads/2026/08/EEB-response-to-the-review-of-the-Iron-and-Steel-BREF.pdf
+# ------------------------------------------------------------
+- id: steel_bref
+  name_ko: 철강 BREF 개정 (IED BAT 결론)
+  name_en: Iron and Steel Production BREF review (BAT conclusions under IED)
+  status: pending
+  stage: preparation
+  legal_form: Implementing Act
+  legal_ref: "현행: Commission Implementing Decision 2012/135/EU (철강 BAT 결론)"
+  dg: ENV
+  category: [industrial_emissions]
+  steel_relevance: high
+  summary: >
+    산업배출지침에 따른 철강 생산 최적가용기법 참고문서(IS BREF)와 BAT 결론 개정. 현행 BAT 결론은 2012년 채택돼
+    수소 직접환원(DRI) 등 신규 저탄소 공정을 반영하지 못한다. JRC EU-BRITE가 2026-03-06 기술작업반(TWG)을 재가동해
+    개정 작업이 시작됐으며, 현재 사전 정보 수집(frontloading) 단계다. 개정 BAT 결론은 IED 2.0의 강화된 배출한도 규칙이 적용된다.
+  requirements:
+    - type: bat_limits
+      text: 코크스·소결·고로·제강 공정 BAT-AEL(배출한도) 재설정, 신규 공정(수소 DRI 등) 반영 검토
+    - type: bat_limits
+      text: BAT 결론 공표 후 4년 내 역내 허가조건 재검토·적용(IED 원칙)
+  scope: "EU 역내 코크스 생산, 철광석 소결·배소, 선철·조강 생산(2.5t/h 초과) 설비"
+  sub_acts:
+    - "Commission Implementing Decision 2012/135/EU — 현행 철강 BAT 결론"
+    - "Commission Implementing Decision (EU) 2022/2110 — 철강 가공(FMP) BAT 결론(별도 문서)"
+  milestones:
+    - date: 2026-03-06
+      label: 철강 BREF 개정 착수(기술작업반 재가동)
+  consultations: []
+  impact:
+    eu_producers:
+      level: medium
+      obligations: 개정 BAT 결론 공표 후 허가조건 재검토 및 배출한도 준수
+      costs: 대기오염물질 저감 설비 개선 투자
+      preparation: TWG 정보 제출(업계 협회 경유), 신규 공정 BAT 반영 대응
+      opportunities: 수소 DRI·전기로 등 저탄소 공정이 BAT로 인정될 경우 전환 투자 허가 용이
+    non_eu_producers:
+      level: low
+      obligations: 직접 의무 없음
+      costs: EU 경쟁사의 환경 규제비용 변화에 따른 간접 영향
+    korea_note: >
+      BREF는 EU 역내 설비 허가 기준으로 한국 수출품에 직접 적용되지 않는다. 다만 BREF는 세계 철강 환경기준의 참고자료로 쓰이므로
+      한국 규제(통합환경관리제도 BAT 기준서) 개정 방향에도 참고가 될 수 있고, 수소환원제철 등 신규 공정의 BAT 반영 여부는
+      기술 동향 측면에서 주시할 가치가 있다. EU 역내 생산 거점이 있다면 개정 일정을 추적해야 한다.
+  links:
+    commission: "https://bureau-industrial-transformation.jrc.ec.europa.eu/reference/iron-and-steel-production-0"
+    eurlex: "https://eur-lex.europa.eu/eli/dec_impl/2012/135/oj"
+  related: [ied]
+  verify_needed: true
+  note: >
+    2026-03-06 TWG 재가동은 EU-BRITE 공식 뉴스로 확인. 킥오프 회의는 네덜란드 IPLO 일정표상 2026년 11~12월 계획이나 공식 일정 미공표로 milestones에 넣지 않음.
+    초안(D1)·최종회의·BAT 결론 채택 예정 시점은 미확인. FMP BAT 결론 번호 (EU) 2022/2110은 이번 조사에서 원문 재확인하지 못함.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# [red3] 출처:
+# - Commission RED 페이지: https://energy.ec.europa.eu/topics/renewable-energy/renewable-energy-directive-and-rules/renewable-energy-directive_en
+#   (구 URL .../renewable-energy-directive-targets-and-rules/... 에서 301 리다이렉트)
+# - 저탄소 연료 방법론 위임규정 (EU) 2025/2359: https://eur-lex.europa.eu/eli/reg_del/2025/2359/oj/eng (검색결과로 확인, 본문 조회 차단)
+# - HYS API 17453(2030 이후 재생에너지 체계), 19515(RFNBO·저탄소연료 방법론 통합), 14303: https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/17453 등
+# ------------------------------------------------------------
+- id: red3
+  name_ko: 재생에너지지침 개정 (RED III)
+  name_en: Renewable Energy Directive (RED III)
+  status: in_force
+  stage: adopted
+  legal_form: Directive
+  legal_ref: "Directive (EU) 2023/2413 (Directive (EU) 2018/2001 개정)"
+  dg: ENER
+  category: [energy_hydrogen]
+  steel_relevance: low
+  effective_date: 2023-11-20
+  summary: >
+    2030년 재생에너지 비중 목표를 최소 42.5%(목표 45%)로 상향한 지침 개정. 산업 부문 수소 사용 중 재생 수소(RFNBO) 비중
+    구속력 목표(제22a조)를 도입해 수소환원제철 연료 조달에 영향을 준다. 2023-11-20 발효, 대부분 조항의 전환 기한은 발효 후 18개월이다.
+    Commission은 2030년 이후 재생에너지 법체계 제안을 2026년 말 발표 예정이다(renewables_post2030 참고).
+  requirements:
+    - type: product_info
+      text: "산업용 수소 중 RFNBO 비중 목표(제22a조, 회원국 단위) — RFNBO는 위임규정 (EU) 2023/1184·2023/1185 기준 충족 필요"
+    - type: carbon_footprint
+      text: "RFNBO 온실가스 감축 70% 이상(위임규정 (EU) 2023/1185 방법론)"
+  scope: "회원국 산업 부문 수소 사용(철강 수소 DRI 포함), 재생에너지 전반"
+  sub_acts:
+    - "Commission Delegated Regulation (EU) 2023/1184 — RFNBO 생산 규칙(추가성 등)"
+    - "Commission Delegated Regulation (EU) 2023/1185 — RFNBO 온실가스 감축 산정 방법론"
+    - "Commission Delegated Regulation (EU) 2025/2359 — 저탄소 연료(저탄소 수소) 감축 방법론 (Directive (EU) 2024/1788 근거)"
+    - "RFNBO·저탄소연료 방법론 통합 위임규정(예정, 원자력 전력 기준 추가) — HYS 19515"
+  milestones:
+    - date: 2023-11-20
+      label: 개정 지침 발효
+    - date: 2025-05-21
+      label: 대부분 조항 회원국 전환 기한(발효 후 18개월)
+    - date: 2026-06-12
+      label: 2030 이후 재생에너지 체계 공개협의 마감
+  consultations: []
+  impact:
+    eu_producers:
+      level: low
+      obligations: 직접 의무는 회원국에 있음. 수소 사용 철강사는 회원국 이행 방식(쿼터·인증)에 따라 RFNBO 사용 요구 가능
+      costs: RFNBO 조달 비용
+      preparation: 수소환원제철(H2-DRI) 연료 조달 계획, RFNBO 인증 체계 확인
+      opportunities: 재생 수소 지원 제도(수소은행 등) 활용
+    non_eu_producers:
+      level: low
+      obligations: 직접 의무 없음
+      costs: 간접 영향 없음에 가까움
+      preparation: 수소 인증(RFNBO·저탄소) 기준 동향 파악
+    korea_note: >
+      한국산 철강 수출에는 직접 의무가 없다. 다만 한국 기업이 EU에 수소·암모니아를 공급하거나 해외 수소 조달로 저탄소 철강을 생산하려면
+      RFNBO(2023/1184·1185)와 저탄소 수소(2025/2359) 인증 기준을 충족해야 하며, 이는 CBAM 내재배출량 산정 시 수소 원단위에도 영향을 줄 수 있다.
+  links:
+    commission: "https://energy.ec.europa.eu/topics/renewable-energy/renewable-energy-directive-and-rules/renewable-energy-directive_en"
+    eurlex: "https://eur-lex.europa.eu/eli/dir/2023/2413/oj"
+  related: [renewables_post2030, hydrogen_ghg_methodology, hydrogen_strategy]
+  verify_needed: true
+  note: >
+    산업용 RFNBO 목표 수치(2030년 42%, 2035년 60%)는 Commission 페이지에서 확인되지 않아 requirements에 수치를 넣지 않음(EUR-Lex 원문 확인 필요).
+    전환 기한 2025-05-21은 '발효 후 18개월'(Commission 페이지)로 계산한 값. 회원국 전환·위반절차 현황 미확인.
+  last_verified: 2026-10-27
+
+# ============================================================
+# 신규 후보 (seed에 없음)
+# ============================================================
+
+# ------------------------------------------------------------
+# [ets_benchmarks_2026_2030] 출처:
+# - Implementing Regulation (EU) 2026/1412 사본(OJ L 29.6.2026, 부속서 벤치마크 표): https://www.afec.es/documentos/english/regulation-2026-1412.pdf
+# - COM(2026) 619 본문(2026/0211(COD), 의견수렴 경과 기술): https://climate.ec.europa.eu/document/download/672f0f66-a1c2-41d4-a6d6-ff82fea1eb62_en
+# - OEIL 2026/0211(COD): https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2026/0211(COD)
+# - HYS API 15873, 14549: https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/15873
+# - EUROMETAL(철강 값 교차확인): https://eurometal.net/european-commission-publishes-delayed-lower-ferrous-ets-benchmarks/
+# ------------------------------------------------------------
+- id: ets_benchmarks_2026_2030
+  name_ko: EU ETS 무상할당 벤치마크 갱신 (2026~2030)
+  name_en: EU ETS benchmark values for free allocation 2026-2030
+  status: in_force
+  stage: adopted
+  legal_form: Implementing Act
+  legal_ref: "Commission Implementing Regulation (EU) 2026/1412"
+  dg: CLIMA
+  category: [carbon_pricing_trade]
+  steel_relevance: high
+  effective_date: 2026-06-30
+  summary: >
+    2026~2030 ETS 무상할당 산정에 쓰이는 54개 벤치마크(제품 52, 열·연료 fallback 2)를 2021~2022년 상위 10% 설비 성과로 갱신한
+    이행규칙(2026-06-26 채택, 2026-06-29 관보, 다음 날 발효). 철강 벤치마크가 대부분 하향됐다(고로 용선 1.248, 코크스 0.143,
+    소결광 0.086, 전기로 탄소강 0.142, 전기로 고합금강 0.176 배출권/t). 수소 직접환원 철강은 hot metal 벤치마크 평균 산정에서 제외됐다.
+    후속으로 열·연료 fallback 벤치마크 상향 Regulation 제안(COM(2026) 619)이 의회에서 긴급절차로 처리 중이다.
+  requirements:
+    - type: bat_limits
+      text: "철강 제품 벤치마크(배출권/t): 고로 용선 1.248, 코크스 0.143, 소결광 0.086, 전기로 탄소강 0.142, 전기로 고합금강 0.176"
+    - type: certificate
+      text: 벤치마크 × 활동량 × CBAM factor로 설비별 무상할당 결정 → CBAM 인증서 조정에도 반영 예정
+  scope: "EU ETS 무상할당 대상 설비(철강 포함). CBAM 무상할당 조정 기준값과 연계"
+  sub_acts:
+    - "COM(2026) 619 / 2026/0211(COD) — 2026~2030 열·연료 fallback 벤치마크 상향 Regulation 제안"
+    - "CBAM 인증서 조정용 벤치마크 정렬 이행규칙(예정) — HYS 16933(TAXUD), 초안 의견수렴 예정"
+  milestones:
+    - date: 2026-06-26
+      label: Implementing Regulation (EU) 2026/1412 채택
+    - date: 2026-06-29
+      label: 관보 게재
+    - date: 2026-06-30
+      label: 발효
+    - date: 2026-07-17
+      label: fallback 벤치마크 상향 Regulation 제안 COM(2026) 619
+    - date: 2026-10-19
+      label: 유럽의회 ENVI 위원회 표결(COM(2026) 619)
+    - date: 2026-10-22
+      label: 유럽의회 본회의 — 3자협상 위해 위원회 회부(COM(2026) 619)
+  consultations:
+    - type: draft_act_feedback
+      title: "COMMISSION IMPLEMENTING REGULATION (EU) …/... determining revised benchmark values for free allocation of emission allowances for the period from 2026 to 2030 pursuant to Article 10a(2) of Directive 2003/87/EC"
+      start: 2026-05-11
+      end: 2026-06-08
+      summary: 벤치마크 값 초안 의견수렴(442건). fallback 벤치마크 하향·업종별 fallback 요구 의견 다수
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/15873-Revision-of-the-benchmark-values-for-free-allocation-of-emission-allowances-2026-2030-_en"
+    - type: draft_act_feedback
+      title: "Proposal for a REGULATION OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL amending Directive 2003/87/EC as regards revised benchmark values for the heat and fuel benchmarks for the period from 2026 to 2030"
+      start: 2026-08-20
+      end: 2026-11-03
+      summary: fallback(열·연료) 벤치마크 상향 Regulation 제안 COM(2026) 619 피드백(진행 중)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14549-EU-emissions-trading-system-for-maritime-aviation-and-stationary-installations-and-market-stability-reserve-review_en"
+  impact:
+    eu_producers:
+      level: high
+      obligations: 신규 벤치마크 기준 무상할당 수령
+      costs: 철강 벤치마크 하향으로 무상할당 감소, 배출권 구매 부담 증가
+      preparation: 설비별 무상할당 변동 확인, 저배출 공정 전환 검토
+      opportunities: fallback 벤치마크 상향안 채택 시 열·연료 기반 공정 할당 일부 회복
+    non_eu_producers:
+      level: medium
+      obligations: 직접 의무 없음
+      costs: CBAM 인증서 조정(무상할당 반영분)이 이 벤치마크에 연동되어 실질 CBAM 부담에 영향
+      preparation: CBAM 기본값·무상할당 조정 이행규칙(HYS 16933) 초안 공개 시 의견 제출 검토
+    korea_note: >
+      CBAM 인증서 의무량은 EU 동종 제품의 무상할당(벤치마크 기반)만큼 차감되므로, 2026~2030 철강 벤치마크 하향은 한국산 철강의
+      실질 CBAM 부담을 키우는 방향으로 작용한다. CBAM 쪽 벤치마크 정렬 이행규칙(HYS 16933) 초안 의견수렴이 예정돼 있어 공개 시점을 주시할 필요가 있다.
+  links:
+    commission: "https://climate.ec.europa.eu/areas-action/carbon-markets/eu-emissions-trading-system-eu-ets/free-allocation_en"
+    eurlex: "https://eur-lex.europa.eu/eli/reg_impl/2026/1412/oj"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/15873-Revision-of-the-benchmark-values-for-free-allocation-of-emission-allowances-2026-2030-_en"
+    oeil: "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2026/0211(COD)"
+  related: [eu_ets, ets_review, cbam, cbam_secondary_acts]
+  verify_needed: true
+  note: >
+    채택일·관보일·발효 조항은 관보 사본으로 확인. 부속서 표가 PDF 추출 시 열이 어긋나 철강 값은 EUROMETAL 보도(초안 값)와 대조해 일치하는 값만 기재.
+    EUR-Lex 원문은 조회 차단으로 직접 확인하지 못함. COM(2026) 619의 이사회 입장·3자협상 일정은 미확인.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# [hydrogen_strategy] 출처:
+# - HYS API 18695: https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/18695
+# - Commission 수소 페이지: https://energy.ec.europa.eu/topics/eus-energy-system/hydrogen_en
+# ------------------------------------------------------------
+- id: hydrogen_strategy
+  name_ko: EU 수소전략 개정
+  name_en: Renewed EU Hydrogen Strategy
+  status: pending
+  stage: call_for_evidence
+  legal_form: Communication
+  dg: ENER
+  category: [energy_hydrogen]
+  steel_relevance: medium
+  summary: >
+    시장·지정학 변화를 반영해 2020년 수소전략을 개정하는 Commission 이니셔티브. 경쟁력·회복력·에너지안보 측면의 수소 역할과
+    전기화가 어려운 부문(철강 등)을 우선 배치 대상으로 다루고, 유럽 수소 가치사슬 확대 조치를 제시할 예정이다.
+    Call for Evidence가 2026-10-26부터 2026-11-23까지 진행 중이다.
+  requirements: []
+  scope: "EU 수소 생산·수입·인프라·수요(철강 수소 DRI 포함)"
+  milestones:
+    - date: 2026-07-09
+      label: 이니셔티브 예고(HYS)
+    - date: 2026-10-26
+      label: Call for Evidence 개시
+    - date: 2026-11-23
+      label: Call for Evidence 마감
+  consultations:
+    - type: call_for_evidence
+      title: "A renewed hydrogen strategy for a more resilient and competitive Europe"
+      start: 2026-10-26
+      end: 2026-11-23
+      summary: 수소전략 개정 방향(우선 부문, 가치사슬 확대 조치)에 대한 의견수렴
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/18695-Hydrogen-strategy_en"
+  impact:
+    eu_producers:
+      level: medium
+      obligations: 직접 의무 없음(전략 문서)
+      costs: 수소 공급·가격 정책 방향에 따라 수소 DRI 전환 비용 영향
+      preparation: 철강 부문 수소 수요·지원 필요성 의견 제출
+      opportunities: 철강을 우선 수요처로 하는 지원·인프라 정책 반영 가능성
+    non_eu_producers:
+      level: low
+      obligations: 직접 의무 없음
+      costs: 간접 영향
+      preparation: EU 수소 수입·인증 정책 방향 파악
+      opportunities: 역외 수소·파생물 수입 정책이 포함될 경우 공급 협력 기회
+    korea_note: >
+      전략 자체는 구속력이 없으나 향후 EU 수소 지원·수입 정책 방향을 정한다. 한국 철강사는 수소환원제철 기술 동향과
+      EU의 철강 부문 수소 우선 배분 여부를 파악하고, 필요 시 2026-11-23 마감 전 의견 제출을 검토할 수 있다.
+  links:
+    commission: "https://energy.ec.europa.eu/topics/eus-energy-system/hydrogen_en"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/18695-Hydrogen-strategy_en"
+  related: [red3, hydrogen_ghg_methodology]
+  verify_needed: true
+  note: Commission 채택 예정 시점은 HYS에 표시되지 않아 미확인. 철강 관련 구체 조치는 초안 공개 전이라 requirements 비움.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# [hydrogen_ghg_methodology] 출처:
+# - EUR-Lex ELI (검색결과로 확인, 본문 조회 차단): https://eur-lex.europa.eu/eli/reg_del/2025/2359/oj/eng
+# - HYS API 14303(채택 C(2025)4674, 2025-07-08), 19515(통합 위임규정 예고 2026-10-21): https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/14303 , .../19515
+# - 관보일·발효일 보조 출처: https://www.gleisslutz.com/en/know-how/assessment-greenhouse-gas-emission-savings-what-eu-commissions-delegated-regulation-means-energy-sector
+# ------------------------------------------------------------
+- id: hydrogen_ghg_methodology
+  name_ko: 저탄소 수소·RFNBO 온실가스 감축 산정 방법론 (위임규정)
+  name_en: Low-carbon fuels GHG savings methodology (Delegated Regulation (EU) 2025/2359) and planned RFNBO/LCF methodology merger
+  status: in_force
+  stage: adopted
+  legal_form: Delegated Act
+  legal_ref: "Commission Delegated Regulation (EU) 2025/2359"
+  dg: ENER
+  category: [energy_hydrogen, product_footprint]
+  steel_relevance: medium
+  effective_date: 2025-12-11
+  summary: >
+    가스·수소 시장 지침(Directive (EU) 2024/1788)에 따라 저탄소 연료(저탄소 수소 포함)의 온실가스 감축량 산정 방법론을 정한 위임규정.
+    화석연료 대비 70% 이상 감축을 '저탄소'로 인정하며 RFNBO 방법론(2023/1185)과 같은 전과정 접근을 따른다.
+    2025-07-08 채택, 2025-11-21 관보 게재. Commission은 2026-10-21 RFNBO·저탄소연료 방법론을 하나로 통합하고
+    원자력 전력 기준을 추가하는 위임규정 개정을 예고했다(초안 의견수렴 예정).
+  requirements:
+    - type: carbon_footprint
+      text: 저탄소 수소 인정 요건 — 전과정 배출 기준 화석연료 대비 70% 이상 감축(방법론에 따른 산정·인증)
+  scope: "EU 시장의 저탄소 수소·연료 생산자 및 수입품(역외 생산 포함)"
+  sub_acts:
+    - "Commission Delegated Regulation (EU) 2023/1185 — RFNBO 방법론"
+    - "RFNBO·저탄소연료 방법론 통합 위임규정(예정) — HYS 19515, 초안 의견수렴 예정"
+  milestones:
+    - date: 2025-07-08
+      label: 위임규정 채택 C(2025)4674
+    - date: 2025-11-21
+      label: 관보 게재
+    - date: 2025-12-11
+      label: 발효
+    - date: 2026-10-21
+      label: 방법론 통합 위임규정 이니셔티브 예고
+  consultations: []
+  impact:
+    eu_producers:
+      level: low
+      obligations: 저탄소 수소 사용 시 인증 기준 확인
+      costs: 인증 비용
+      preparation: 수소 DRI용 수소의 RFNBO/저탄소 인증 확보 방안
+      opportunities: 원자력 기반 수소 인정 시 조달 선택지 확대
+    non_eu_producers:
+      level: low
+      obligations: EU로 수소를 수출하는 경우에만 인증 기준 충족 필요
+      costs: 인증 비용
+      preparation: 통합 방법론 초안 공개 시 내용 확인
+    korea_note: >
+      한국산 철강에는 직접 적용되지 않는다. 다만 한국 기업이 EU향 수소·암모니아 공급을 추진하거나 원자력 기반 수소 활용을 검토한다면
+      통합 방법론 초안(원자력 전력 기준 포함)에 주목할 필요가 있다.
+  links:
+    commission: "https://energy.ec.europa.eu/topics/eus-energy-system/hydrogen_en"
+    eurlex: "https://eur-lex.europa.eu/eli/reg_del/2025/2359/oj"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/19515-Merge-of-the-methodologies-for-GHG-emission-savings-for-renewable-fuels-of-non-biological-origin-and-low-carbon-fuels_en"
+  related: [red3, hydrogen_strategy]
+  verify_needed: true
+  note: >
+    채택일은 HYS로 확인. 관보일(2025-11-21)·발효일(2025-12-11)은 법률사무소 자료·EUR-Lex 검색결과 기준이며 원문은 조회 차단으로 직접 확인하지 못함.
+    통합 위임규정 초안 의견수렴 일정은 HYS상 'UPCOMING'으로 날짜 미정.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# [renewables_post2030] 출처:
+# - HYS API 17453: https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/17453
+# - Commission RED 페이지(2026년 4분기 채택 일정): https://energy.ec.europa.eu/topics/renewable-energy/renewable-energy-directive-and-rules/renewable-energy-directive_en
+# ------------------------------------------------------------
+- id: renewables_post2030
+  name_ko: 2030년 이후 재생에너지 법체계
+  name_en: Renewable energy legal framework post-2030
+  status: pending
+  stage: consultation
+  legal_form: Directive
+  dg: ENER
+  category: [energy_hydrogen]
+  steel_relevance: low
+  summary: >
+    2040년 -90% 목표 달성을 위해 2030년 이후 재생에너지 체계를 마련하는 Directive 제안 준비 이니셔티브.
+    Call for Evidence(2026-03-19~04-16)와 공개협의(2026-03-20~06-12)를 마쳤고, Commission은 2026년 4분기 제안을 예정하고 있다.
+    산업용 RFNBO 목표 등 RED III 산업 조항의 2030년 이후 방향이 포함될 수 있다.
+  requirements: []
+  scope: "EU 재생에너지 전반(산업 부문 재생에너지·수소 포함 가능)"
+  milestones:
+    - date: 2026-03-19
+      label: Call for Evidence 개시
+    - date: 2026-06-12
+      label: 공개협의 마감
+  consultations:
+    - type: call_for_evidence
+      title: "Framework for the promotion and use of energy from renewable sources"
+      start: 2026-03-19
+      end: 2026-04-16
+      summary: 2030년 이후 재생에너지 체계 영향평가 Call for Evidence (303건)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/17453-Renewable-energy-legal-framework-post-2030_en"
+    - type: public_consultation
+      title: "Public consultation on the renewable energy framework for the decade ahead"
+      start: 2026-03-20
+      end: 2026-06-12
+      summary: 2030년 이후 재생에너지 체계 공개협의(454건)
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/17453-Renewable-energy-legal-framework-post-2030_en"
+  impact:
+    eu_producers:
+      level: low
+      obligations: 제안 전 단계
+      preparation: 산업용 재생에너지·RFNBO 목표의 2030년 이후 방향 모니터링
+    non_eu_producers:
+      level: low
+      obligations: 직접 의무 없음
+    korea_note: >
+      한국 철강 수출에 대한 직접 영향은 없다. 산업 부문 재생 수소 목표가 강화되면 EU 철강사의 수소 전환 속도와 비용 구조가 바뀌어
+      중장기 경쟁 여건에 영향을 줄 수 있으므로 제안 발표(2026년 4분기 예정)를 확인할 필요가 있다.
+  links:
+    commission: "https://energy.ec.europa.eu/topics/renewable-energy/renewable-energy-directive-and-rules/renewable-energy-directive_en"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/17453-Renewable-energy-legal-framework-post-2030_en"
+  related: [red3, climate_law_2040]
+  verify_needed: true
+  note: "제안 시점 '2026년 4분기'는 Commission 페이지 일정표 기준(정확한 날짜 미정). 철강 관련 조항 포함 여부 미확인."
+  last_verified: 2026-10-27
+
+# ============================================================
+# 출처 조사 파일: research_product_market
+# ============================================================
+# 제품·시장 정책 리서치 결과 (2026-10-27 기준)
+# 대상: espr, espr_steel, cpr, nzia, industrial_accelerator_act, elv_regulation
+# 신규: steel_metals_action_plan, public_procurement_act, circular_economy_act, industrial_decarbonisation_bank
+# 스키마: src/models.py (extra 필드 금지). Have Your Say 일자는 brpapi JSON(publishedDate/endDate) 기준.
+
+# ------------------------------------------------------------
+# Sources (espr):
+# - https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/16052 (DPP 레지스트리 이행규정 초안 피드백 2026-04-29~05-27)
+# - https://environment.ec.europa.eu/news/new-eu-rules-stop-destruction-unsold-clothes-and-shoes-2026-02-09_en
+# - https://single-market-economy.ec.europa.eu/document/download/cad28304-4b49-4396-81a8-6a816d8f1a93_en (COM(2025) 772 각주: ESPR 2024.6.13 채택, OJ 2024.6.28)
+# - https://espratlas.com/sectors/iron-steel/ (COM(2025) 187 작업계획 EUR-Lex 링크 확인용)
+# - https://single-market-economy.ec.europa.eu/document/download/59557310-3af0-426d-b6b6-0357b650065f_en (COM(2026) 590: ESPR 제65조 녹색조달 조항 이관)
+# ------------------------------------------------------------
+- id: espr
+  name_ko: 에코디자인 규정 (ESPR)
+  name_en: Ecodesign for Sustainable Products Regulation (ESPR)
+  status: in_force
+  legal_form: Regulation
+  legal_ref: "Regulation (EU) 2024/1781"
+  dg: GROW
+  category: [product_footprint]
+  steel_relevance: medium
+  effective_date: 2024-07-18
+  summary: >
+    EU 시장에 출시되는 제품의 지속가능성 요건(내구성·재활용성·재활용 함량·탄소/환경발자국·정보 요건)과
+    디지털 제품여권(DPP)을 위임법령으로 정하는 프레임워크 규정. 2025~2030 작업계획(COM(2025) 187)에서
+    철강을 우선 중간재로 지정했고, 2026.5 철강 위임법령 Call for Evidence·공개협의가 진행·마감되었다(espr_steel 참고).
+    2026.2 미판매 소비재(의류·신발) 폐기금지 관련 위임·이행법령이 채택되었고, DPP 레지스트리 이행규정 초안 피드백이 2026.5 마감되었다.
+    2026.9 제안된 공공조달법(COM(2026) 590)은 ESPR의 녹색공공조달 조항(제65조)을 공공조달법 제54조로 이관하는 안을 담고 있다.
+  requirements:
+    - type: product_info
+      text: 제품군별 위임법령으로 성능·정보 요건(탄소·환경발자국, 재활용 함량, 우려물질) 및 디지털 제품여권(DPP) 도입
+    - type: labelling
+      text: 위임법령에 따라 성능 등급·라벨 도입 가능
+    - type: procurement
+      text: 위임법령에 근거한 녹색공공조달 의무 요건 설정 가능(공공조달법 제안 시 해당 법으로 이관 예정)
+  scope: "EU 시장 출시 제품 전반(식품·의약품 등 제외). 철강은 철강 위임법령 채택·적용 후 대상"
+  sub_acts:
+    - "ESPR·에너지라벨 작업계획 2025-2030 (COM(2025) 187)"
+    - "철강 제품 에코디자인 위임법령(준비 중, espr_steel)"
+    - "미판매 소비재 폐기금지 예외 위임규정·공개양식 이행규정 (2026.2.9 채택)"
+    - "DPP 레지스트리 이행규정(초안 피드백 2026.4.29~5.27)"
+    - "DPP 서비스 제공자 위임법령(준비 중)"
+  milestones:
+    - date: 2024-06-28
+      label: 관보 게재
+    - date: 2024-07-18
+      label: 발효
+    - date: 2026-02-09
+      label: 미판매 의류·신발 폐기금지 관련 위임·이행법령 채택
+    - date: 2026-05-20
+      label: 철강 위임법령 Call for Evidence·공개협의 개시
+  consultations:
+    - type: draft_act_feedback
+      title: "COMMISSION IMPLEMENTING REGULATION (EU) …/... laying down the implementation arrangements for the digital product passport registry set up under Regulation (EU) 2024/1781"
+      start: 2026-04-29
+      end: 2026-05-27
+      summary: DPP 레지스트리 운영 세부 규칙 이행규정 초안. 철강 DPP 도입 시 등록 체계의 기반이 된다.
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/16052-Digital-Product-Passport-Registry-DPP-_en"
+  impact:
+    eu_producers:
+      level: medium
+      obligations: 제품군별 위임법령 채택 후 성능·정보 요건 및 DPP 준수
+      preparation: 제품 단위 탄소발자국·재활용 함량 데이터 체계 구축
+      opportunities: 저탄소·고재활용 제품의 시장 차별화
+    non_eu_producers:
+      level: medium
+      obligations: EU 시장 출시 제품에 역내산과 동일 적용(수입자·제조자 책임)
+      preparation: 제품 단위 데이터 산정·제공, DPP 데이터 연계
+      opportunities: 데이터 투명성 확보 시 동등한 시장 접근
+    korea_note: >
+      ESPR 자체는 프레임워크이며 철강에 대한 실제 의무는 철강 위임법령(espr_steel)으로 발생한다.
+      한국 철강사는 CBAM용 설비 단위 배출 데이터와 별개로 제품 단위 탄소발자국·재활용 함량·DPP 데이터 요구에 대비해야 하며,
+      자동차·가전 등 하류 제품 위임법령을 통해 고객사로부터 소재 데이터 요청이 먼저 올 수 있다.
+  links:
+    commission: "https://environment.ec.europa.eu/strategy/circular-economy/ecodesign-sustainable-products-regulation_en"
+    eurlex: "https://eur-lex.europa.eu/eli/reg/2024/1781/oj"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/17672-Ecodesign-requirements-for-iron-and-steel-products_en"
+  related: [espr_steel, cpr, industrial_accelerator_act, public_procurement_act]
+  verify_needed: true
+  note: >
+    작업계획 채택일(2025.4.16로 알려짐)과 2026.2 채택 법령의 번호(C(2026) 659/660 vs (EU) 2026/296 등 출처 불일치)는
+    EUR-Lex 접속 불가로 미확인. DPP 레지스트리 이행규정 채택 여부 미확인.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# Sources (espr_steel):
+# - https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/17672 (HYS JSON: CfE·OPC 2026-05-20~2026-08-12, 위임법령 계획 2026 Q4)
+# - https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/17672-Ecodesign-requirements-for-iron-and-steel-products_en
+# - https://public.cdxsystem.com/en/web/cdx/w/espr-delegated-act-on-iron-and-steel-commission-opens-stakeholder-consultation (정책 옵션 요약, 2차 출처)
+# - https://data.consilium.europa.eu/doc/document/ST-7288-2025-INIT/en/pdf (COM(2025) 125: ESPR이 IAA 라벨 보완)
+# ------------------------------------------------------------
+- id: espr_steel
+  name_ko: ESPR 철강 위임법령
+  name_en: ESPR delegated act on iron and steel products
+  status: pending
+  stage: consultation
+  legal_form: Delegated Act
+  dg: GROW
+  category: [product_footprint]
+  steel_relevance: high
+  summary: >
+    ESPR에 따라 철강 제품의 에코디자인 요건을 정하는 위임규정. 2026.5.20~8.12 영향평가 Call for Evidence와 공개협의가 진행되어 마감되었다.
+    검토 중인 정책 옵션은 (1) 탄소발자국·재활용 함량·재활용 저해 물질 정보 공개 의무, (2) 탄소발자국 기반 성능 등급·최소 성능 기준,
+    (3) 공급망 전체의 디지털 제품여권(DPP)이다. Have Your Say상 위임법령 채택 계획 시기는 2026년 4분기이나, 위임법령 초안 피드백은 아직 게시되지 않았다.
+    산업가속화법(IAA) 제안의 저탄소 철강 정의가 이 위임법령과 연계될 것으로 보도되었다.
+  requirements:
+    - type: carbon_footprint
+      text: 철강 제품 탄소발자국 산정·공개 및 탄소발자국 기반 성능 등급·최소 기준(옵션)
+    - type: product_info
+      text: 재활용 함량, 재활용 저해 물질 정보 공개(옵션)
+    - type: product_info
+      text: 공급망 전체 디지털 제품여권(DPP) 요건(옵션)
+    - type: labelling
+      text: 성능 등급 표시 가능성(옵션 확정 전)
+  scope: "EU 시장에 출시되는 철강 제품(구체적 품목 범위는 초안 공개 후 확정)"
+  sub_acts:
+    - "Regulation (EU) 2024/1781 (모법)"
+  milestones:
+    - date: 2026-04-15
+      label: Have Your Say 이니셔티브 등록
+    - date: 2026-05-20
+      label: Call for Evidence·공개협의 개시
+    - date: 2026-08-12
+      label: Call for Evidence·공개협의 마감
+  consultations:
+    - type: call_for_evidence
+      title: "Commission Delegated Regulation establishing ecodesign requirements for sustainable and circular 'iron and steel' products under Regulation (EU) 2024/1781 of the European Parliament and of the Council"
+      start: 2026-05-20
+      end: 2026-08-12
+      summary: 영향평가용 Call for Evidence(Ares(2026)5076198). 탄소발자국·재활용 함량 정보 요건, 성능 등급, DPP 등 정책 옵션 제시.
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/17672-Ecodesign-requirements-for-iron-and-steel-products_en"
+    - type: public_consultation
+      title: "Public consultation for the impact assessment on ecodesign requirements for iron and steel products"
+      start: 2026-05-20
+      end: 2026-08-12
+      summary: 철강 에코디자인 요건 영향평가를 위한 공개 설문.
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/17672-Ecodesign-requirements-for-iron-and-steel-products_en"
+  impact:
+    eu_producers:
+      level: high
+      obligations: 채택 시 제품 단위 탄소발자국·재활용 함량 공개, 성능 기준·DPP 준수
+      preparation: 제품 단위 LCA 데이터, ETS 데이터와의 정합성 확보
+      opportunities: 저탄소 제품의 등급 차별화
+    non_eu_producers:
+      level: high
+      obligations: EU 시장 출시 제품에 동일 적용, 최소 성능 기준 도입 시 미달 제품 판매 제한 가능
+      preparation: 제품 단위 탄소발자국 산정·검증, 스크랩 사용률 데이터, DPP 대응
+      opportunities: 저탄소 제품 보유 시 등급 기반 프리미엄 확보
+    korea_note: >
+      한국 철강사에 가장 직접적인 제품 규제 후보. CBAM은 설비 단위 내재배출량이지만 ESPR은 제품 단위 탄소발자국과 등급을 요구할 수 있어
+      산정 방법론 차이에 대비해야 한다. 최소 성능 기준(옵션 2)이 채택되면 고로재 비중이 높은 수출품의 시장 접근에 직접 영향이 있다.
+      위임법령 초안 피드백(4주 예상) 공개 시 산정 방법론·전환기간에 의견을 내는 것이 중요하다.
+  links:
+    commission: "https://environment.ec.europa.eu/strategy/circular-economy/ecodesign-sustainable-products-regulation_en"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/17672-Ecodesign-requirements-for-iron-and-steel-products_en"
+  related: [espr, industrial_accelerator_act, cbam]
+  verify_needed: true
+  note: >
+    Have Your Say상 채택 계획(2026 Q4)은 예정이며 위임법령 초안 피드백 기간·일자 미공개. 적용 시점(ESPR상 원칙적으로 발효 후 18개월 이후)과
+    정책 옵션 최종 선택은 미확정. 정책 옵션 요약은 2차 출처 기반.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# Sources (cpr):
+# - https://single-market-economy.ec.europa.eu/sectors/construction/construction-products-regulation-cpr/cpr-2024-revision_en (발효 2025-01-07, 적용 2026-01-08)
+# - https://single-market-economy.ec.europa.eu/document/download/cad28304-4b49-4396-81a8-6a816d8f1a93_en (COM(2025) 772 CPR 작업계획 2026-2029: OJ 2024.12.18, 철강 제품군, ETS 데이터 위임법령, 녹색조달 영향평가 2026년 말)
+# - https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/14933 (AVS 위임규정 초안 피드백 2025-12-10~2026-01-07, C(2026)3835)
+# - https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2026%2F0068%28COD%29 (IAA가 2024/3110 개정)
+# ------------------------------------------------------------
+- id: cpr
+  name_ko: 건설제품규정 개정 (CPR)
+  name_en: Construction Products Regulation (CPR)
+  status: in_force
+  legal_form: Regulation
+  legal_ref: "Regulation (EU) 2024/3110"
+  dg: GROW
+  category: [product_footprint, procurement_market]
+  steel_relevance: medium
+  effective_date: 2026-01-08
+  summary: >
+    건설제품 유통 규칙을 개정해 성능·적합성 신고(DoPC)에 GWP 등 전과정 환경지속가능성 정보를 포함하고 디지털 제품여권을 도입하는 규정.
+    2025.1.7 발효, 2026.1.8부터 주요 규정 적용. 구 CPR(305/2011)과 장기간 병존하며, 실제 철강 의무는 제품군별 신규 조화기술규격(hEN)과
+    위임법령이 인용·채택되는 시점부터 발생한다. 2025.12 작업계획(COM(2025) 772)에 따르면 구조용 금속제품(제품군 20)은 표준화 요청이
+    채택되었고, 철근·PC강재(제품군 16)는 표준화 요청 준비 중이다. Commission은 ETS 데이터를 환경성 평가 입력값으로 인정하는 위임법령과
+    녹색공공조달 의무 요건 위임법령(2026년 말 영향평가 착수)을 예고했다. 산업가속화법(IAA)·공공조달법 제안이 CPR을 개정하는 안을 포함한다.
+  requirements:
+    - type: product_info
+      text: DoPC에 GWP(총·화석·생물기원·토지이용) 등 부속서 II 환경 필수특성 신고(제품군별 hEN 인용 후)
+    - type: carbon_footprint
+      text: 제품 단위 LCA 기반 GWP 산정, ETS 데이터 활용 인정 위임법령 예고
+    - type: product_info
+      text: 디지털 제품여권(DPP) — 위임법령으로 의무화 시
+    - type: procurement
+      text: 공공조달 최소 환경지속가능성 요건 위임법령 가능(첫 영향평가 2026년 말 착수 예정)
+  scope: "철근·PC강재, 구조용 금속제품(형강·강구조 부재 등) 등 조화기술규격 대상 건설용 강재"
+  sub_acts:
+    - "CPR 작업계획 2026-2029 (COM(2025) 772, 2025.12.16)"
+    - "평가·검증체계(AVS) 위임규정 C(2026)3835"
+    - "제품군별 표준화 요청 및 등급·임계값 위임법령(구조용 금속제품, 철근·PC강재 등)"
+  milestones:
+    - date: 2024-12-18
+      label: 관보 게재
+    - date: 2025-01-07
+      label: 발효
+    - date: 2025-12-16
+      label: CPR 작업계획 2026-2029 발표
+    - date: 2026-01-08
+      label: 주요 규정 적용 개시
+  consultations:
+    - type: draft_act_feedback
+      title: "COMMISSION DELEGATED REGULATION (EU) …/... supplementing Regulation (EU) 2024/3110 of the European Parliament and of the Council by establishing the applicable assessment and verification systems for product families and categories"
+      start: 2025-12-10
+      end: 2026-01-07
+      summary: 제품군·범주별 평가·검증체계(AVS)와 인증기관 역할을 정하는 위임규정 초안. 이후 C(2026)3835로 채택 게시.
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14933-Assessment-and-verification-systems_en"
+  impact:
+    eu_producers:
+      level: medium
+      obligations: 신규 hEN 인용 후 GWP 포함 DoPC 발행, CE 마킹
+      preparation: EPD·GWP 데이터, 인증기관 대응
+      opportunities: 저GWP 제품의 건설 수요처 확보
+    non_eu_producers:
+      level: medium
+      obligations: EU 건설시장 수출 시 동일 신고 의무(수입자·제조자)
+      preparation: EN 15804 기반 EPD, 제품 단위 GWP 데이터, DPP 대응
+      opportunities: 검증된 저GWP 데이터 보유 시 공공조달에서 유리
+    korea_note: >
+      철근·형강·강구조재를 EU에 수출하는 경우 신규 조화규격이 인용되는 시점부터 GWP 신고가 의무화된다. 배경 데이터(기본값)는 보수적으로
+      설정될 예정이어서 자체 실측 데이터가 없으면 불리할 수 있다. ETS 데이터 활용 위임법령은 EU 설비 중심이므로 비EU 생산자의 데이터 인정 방식을 주시해야 한다.
+  links:
+    commission: "https://single-market-economy.ec.europa.eu/sectors/construction/construction-products-regulation-cpr_en"
+    eurlex: "https://eur-lex.europa.eu/eli/reg/2024/3110/oj"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14933-Assessment-and-verification-systems_en"
+    guidance: "https://single-market-economy.ec.europa.eu/sectors/construction/construction-products-regulation-cpr/cpr-2024-revision_en"
+  related: [espr_steel, industrial_accelerator_act, public_procurement_act]
+  verify_needed: true
+  note: >
+    철강 제품군(16, 20)의 hEN 인용·위임법령 채택 일정은 작업계획 표 해석 불가로 미확인. GWP 신고 의무 개시 시점은 제품군별로 다르며 일자 미확정.
+    AVS 위임규정 관보 게재 번호 미확인. effective_date는 seed의 발효일(2025-01-07)에서 적용일(2026-01-08)로 변경.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# Sources (nzia):
+# - https://single-market-economy.ec.europa.eu/industry/sustainability/net-zero-industry-act_en (하위법령 목록: IR 2025/1176, 2025/1178, 2026/718, DR 2025/1463 등)
+# - https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/14467 (공공조달 최소요건 이행규정 초안 피드백 2025-09-16~2025-10-14)
+# - https://www.globalpolicywatch.com/2025/08/adoption-of-implementing-act-on-non-price-criteria-in-renewable-energy-auctions/ (제26조 적용 2025-12-30, 2차 출처)
+# - https://energy.ec.europa.eu/document/download/d8cb7c28-2d96-4b4d-8f1c-15eb8189f506_en (C(2026) 5024: IR 2026/718 풍력 블레이드 재활용, 적용 2026-06-30)
+# - https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2026%2F0068%28COD%29 (IAA가 2024/1735 개정)
+# ------------------------------------------------------------
+- id: nzia
+  name_ko: 넷제로산업법 (NZIA)
+  name_en: Net-Zero Industry Act (NZIA)
+  status: in_force
+  legal_form: Regulation
+  legal_ref: "Regulation (EU) 2024/1735"
+  dg: GROW
+  category: [procurement_market]
+  steel_relevance: low
+  effective_date: 2024-06-29
+  summary: >
+    넷제로 기술 역내 제조 역량 강화를 위한 규정. 공공조달(제25조)·재생에너지 경매(제26조)에 지속가능성·회복력 등 비가격 기준을 도입한다.
+    하위법령으로 재생에너지 경매 비가격 기준 이행규정(EU) 2025/1176, 넷제로 기술 제품·부품 목록 이행규정(EU) 2025/1178,
+    공공조달 최소 환경지속가능성 요건 이행규정(EU) 2026/718(현재 풍력 블레이드 재활용 요건 중심) 등이 채택되었다.
+    철강을 직접 규율하는 조항은 없으나, 산업가속화법(IAA)과 공공조달법 제안이 NZIA를 개정하는 안을 담고 있다.
+  requirements:
+    - type: procurement
+      text: 넷제로 기술 공공조달 시 최소 환경지속가능성 요건(IR 2026/718) 및 회복력 등 추가 기준 적용
+    - type: procurement
+      text: 재생에너지 경매 물량의 30% 이상 또는 연 6GW 이상에 비가격 기준 적용(IR 2025/1176)
+  scope: "넷제로 기술(풍력·태양광·배터리·전해조 등) 공공조달 및 재생에너지 경매. 철강은 부품 소재로 간접 관련"
+  sub_acts:
+    - "Implementing Regulation (EU) 2025/1176 (재생에너지 경매 비가격 기준)"
+    - "Implementing Regulation (EU) 2025/1178 (넷제로 기술 최종제품·주요 부품 목록)"
+    - "Implementing Regulation (EU) 2026/718 (공공조달 최소 환경지속가능성 요건)"
+    - "Delegated Regulation (EU) 2025/1463 (주요 사용 부품)"
+    - "Implementing Decision (EU) 2025/1100 (전략 프로젝트 신청 지침)"
+  milestones:
+    - date: 2024-06-28
+      label: 관보 게재
+    - date: 2024-06-29
+      label: 발효
+    - date: 2025-12-30
+      label: 경매 비가격 기준(제26조) 적용 개시
+    - date: 2026-06-30
+      label: 공공조달 최소 환경지속가능성 요건(IR 2026/718) 적용 개시
+  consultations:
+    - type: draft_act_feedback
+      title: "COMMISSION IMPLEMENTING REGULATION (EU) …/... laying down rules for the application of Regulation (EU) 2024/1735 of the European Parliament and of the Council as regards minimum environmental sustainability requirements"
+      start: 2025-09-16
+      end: 2025-10-14
+      summary: NZIA 공공조달 최소 환경지속가능성 요건 이행규정 초안(이후 IR 2026/718로 채택).
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14467-Minimum-requirements-on-environmental-sustainability-for-NZIA-public-procurement-procedures_en"
+  impact:
+    eu_producers:
+      level: low
+      obligations: 직접 의무 없음
+      opportunities: 넷제로 기술 공급망 수요 확대에 따른 소재 수요
+    non_eu_producers:
+      level: low
+      obligations: 직접 의무 없음, 넷제로 기술 조달·경매에서 회복력 기준에 따른 간접 영향
+      opportunities: 풍력 타워·구조재 등 부품 소재 공급
+    korea_note: >
+      철강 자체에 대한 직접 의무는 없다. 풍력 타워·후판 등 넷제로 기술 부품 소재를 공급하는 경우 EU 발주처의 회복력·지속가능성 기준 적용 여부를
+      확인할 필요가 있다. 철강의 저탄소 공공조달 요건은 NZIA가 아니라 IAA 제안에서 다뤄진다.
+  links:
+    commission: "https://single-market-economy.ec.europa.eu/industry/sustainability/net-zero-industry-act_en"
+    eurlex: "https://eur-lex.europa.eu/eli/reg/2024/1735/oj"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14467-Minimum-requirements-on-environmental-sustainability-for-NZIA-public-procurement-procedures_en"
+  related: [industrial_accelerator_act, public_procurement_act]
+  verify_needed: true
+  note: >
+    제26조 적용일(2025-12-30)은 법률사무소 자료, IR 2026/718 적용일(2026-06-30)은 Commission 통보문 기반(EUR-Lex 원문 접속 불가).
+    제25조 공공조달 조항의 정확한 적용 개시일 미확인.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# Sources (industrial_accelerator_act):
+# - https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2026%2F0068%28COD%29 (COM(2026)0100, 2026-03-04, 공동위원회 INTA/ITRE/IMCO, 본회의 예정 2026-12-14, 개정 대상 2018/1724·2024/3110·2024/1735)
+# - https://www.europarl.europa.eu/legislative-train/theme-a-new-plan-for-europe-s-sustainable-prosperity-and-competitiveness/file-industrial-decarbonisation-accelerator-act (초안 보고서 2026-09-09, 위원회 표결 2026-12-01 예정, 이사회 작업반 2026-09-09~10)
+# - https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/14505 (HYS JSON: CfE 2025-04-15~07-08, OPC 2025-04-16~07-09, 제안 피드백 2026-03-11~06-18)
+# - https://ec.europa.eu/commission/presscorner/detail/en/ip_26_515
+# - https://eprs.europarl.europa.eu/contents/publications/EPRS/2026/09/EPRS_BRI(2026)791495.html (제8조 FTA/GPA 당사국 Union 원산지 간주, 한국은 GPA·FTA 목록 포함)
+# - https://www.consilium.europa.eu/en/meetings/compet/2026/09/24/ (경쟁력이사회 현황 보고, 일반접근 없음)
+# - https://eurometal.net/eu-industrial-accelerator-act-drops-eu-origin-steel-rule-narrows-emissions-sliding-scale-to-primary-steel/ (철강 25% 저탄소, EU 원산지 요건 삭제, 라벨 미포함 — 보도)
+# ------------------------------------------------------------
+- id: industrial_accelerator_act
+  name_ko: 산업가속화법 (IAA)
+  name_en: Industrial Accelerator Act (IAA)
+  status: pending
+  stage: proposal
+  legal_form: Regulation
+  legal_ref: "COM(2026) 100, 2026/0068(COD)"
+  dg: GROW
+  category: [procurement_market, product_footprint]
+  steel_relevance: high
+  summary: >
+    전략 부문의 산업역량 확충과 탈탄소를 가속하기 위한 규정안(2026.3.4 Commission 제안). 공공조달·공공지원에서 'Made in EU'·저탄소 선호,
+    FDI 조건, 산업가속지역, 인허가 간소화를 담는다. 보도에 따르면 철강은 2029.1.1부터 공공조달·공공지원 건축·인프라·교통 프로젝트에서
+    철강 사용량의 최소 25%를 저탄소로 하도록 하고, 초안에 있던 철강 EU 원산지 요건과 자발적 탄소집약도 라벨은 최종 제안에서 빠졌다.
+    저탄소의 정의·산정 방법(ETS·CBAM 방법론 기반)·성능 등급은 향후 위임법령으로 정한다. 제8조(공공조달)는 EU와 FTA·관세동맹을 맺었거나
+    WTO GPA 당사국인 제3국을 Union 원산지로 간주하되, 위임법령으로 배제할 수 있게 한다.
+    유럽의회는 ITRE·IMCO·INTA 공동위원회 절차로 2026.9.9 초안 보고서(제3국 자동 동등성 대신 opt-in 방식, 2036년 50% 상향 제안)를 냈고,
+    위원회 표결 2026.12.1, 본회의 2026.12.14주가 예정되어 있다. 이사회는 일반접근에 이르지 못했다(2026.9.24 경쟁력이사회 현황 보고).
+  requirements:
+    - type: procurement
+      text: 공공조달·공공지원 건축·인프라·교통 프로젝트 철강의 최소 25% 저탄소(2029.1.1부터, 제안 기준·보도)
+    - type: procurement
+      text: 공공조달 'Made in EU'·Union 원산지 요건(FTA·GPA 당사국은 원산지 간주, 위임법령으로 배제 가능)
+    - type: carbon_footprint
+      text: 저탄소 철강 정의·온실가스 집약도 산정(ETS·CBAM 방법론 기반) 및 성능 등급을 위임법령으로 설정
+  scope: "공공조달·공공지원 대상 건축·인프라·교통 프로젝트에 사용되는 철강(시장 전반이 아닌 공공 수요), 시멘트·알루미늄 등 전략 소재"
+  sub_acts:
+    - "저탄소 제품 정의·온실가스 집약도 방법론 위임법령(예정)"
+    - "Union 원산지 간주 국가 배제 위임법령(예정)"
+    - "Regulation (EU) 2024/3110 (CPR), 2024/1735 (NZIA), 2018/1724 개정"
+  milestones:
+    - date: 2025-04-15
+      label: Call for Evidence 게시
+    - date: 2026-03-04
+      label: Commission 제안 (COM(2026) 100)
+    - date: 2026-04-29
+      label: 유럽의회 공동 보고관 지명(ITRE·IMCO·INTA)
+    - date: 2026-05-28
+      label: 경쟁력이사회 정책 토론
+    - date: 2026-07-15
+      label: 유럽경제사회위원회(EESC) 의견 채택
+    - date: 2026-09-09
+      label: 유럽의회 초안 보고서
+    - date: 2026-09-24
+      label: 경쟁력이사회 현황 보고(기타 안건)
+    - date: 2026-12-01
+      label: 유럽의회 공동위원회 표결 예정
+    - date: 2026-12-14
+      label: 유럽의회 본회의 1독회 예정(잠정)
+    - date: 2029-01-01
+      label: 철강 저탄소 25% 조달 요건 적용 개시(제안 기준)
+  consultations:
+    - type: call_for_evidence
+      title: "Legislative proposal for a Regulation of the European Parliament and of the Council on the Industrial Decarbonisation Accelerator Act"
+      start: 2025-04-15
+      end: 2025-07-08
+      summary: 산업탈탄소가속화법(당시 명칭) 영향평가 Call for Evidence.
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14505-Industrial-Decarbonisation-Accelerator-Act-speeding-up-decarbonisation_en"
+    - type: public_consultation
+      title: "IDAA Public Consultation"
+      start: 2025-04-16
+      end: 2025-07-09
+      summary: 저탄소 제품 라벨·공공조달 기준 등에 대한 공개 설문.
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14505-Industrial-Decarbonisation-Accelerator-Act-speeding-up-decarbonisation_en"
+    - type: draft_act_feedback
+      title: "Proposal for a REGULATION OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL establishing a framework of measures for the acceleration of industrial capacity and decarbonisation in strategic sectors (COM(2026)100)"
+      start: 2026-03-11
+      end: 2026-06-18
+      summary: Commission 제안(COM(2026) 100)에 대한 피드백. Have Your Say 게시일 기준 시작.
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14505-Industrial-Decarbonisation-Accelerator-Act-speeding-up-decarbonisation_en"
+  impact:
+    eu_producers:
+      level: medium
+      obligations: 직접 의무는 공공 발주처에 부과, 생산자는 저탄소 입증 데이터 제공
+      preparation: ETS 데이터 기반 저탄소 등급 확보
+      opportunities: 공공 저탄소 철강 수요(리드마켓) 창출, 'Made in EU' 선호
+    non_eu_producers:
+      level: high
+      obligations: EU 공공 프로젝트 납품 시 저탄소 입증(CBAM 방법론 기반 예상), 원산지 요건 충족
+      preparation: CBAM 검증 배출량 데이터 활용, 원산지 증빙
+      opportunities: FTA·GPA 당사국은 원산지 간주로 접근 가능(제안 기준), 저탄소 제품은 25% 할당 수요 확보
+    korea_note: >
+      한국은 EU와 FTA를 체결했고 WTO GPA 당사국이므로 Commission 제안 제8조상 공공조달에서 Union 원산지로 간주될 수 있다. 다만 유럽의회 초안은
+      FTA·GPA에 따른 자동 동등성을 부정하고 opt-in(위임법령으로 국가별 인정) 방식을 제안하고 있어 최종 협상 결과에 따라 접근성이 크게 달라질 수 있다.
+      저탄소 판정이 ETS·CBAM 방법론에 기반할 예정이므로 CBAM용 설비 단위 검증 데이터가 그대로 경쟁력 자료가 된다. 공공지원 제도(제9조)는 GPA 기준이
+      빠져 FTA 기준만 적용되는 점도 확인이 필요하다.
+  links:
+    commission: "https://ec.europa.eu/commission/presscorner/detail/en/ip_26_515"
+    eurlex: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=COM:2026:100:FIN"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14505-Industrial-Decarbonisation-Accelerator-Act-speeding-up-decarbonisation_en"
+    oeil: "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2026/0068(COD)"
+  related: [espr_steel, cpr, nzia, public_procurement_act, steel_metals_action_plan]
+  verify_needed: true
+  note: >
+    철강 25%·2029.1.1·원산지 요건 삭제·라벨 미포함은 언론·2차 출처 기반으로 COM(2026) 100 원문 조항 번호 미확인(EUR-Lex 접속 불가).
+    제안 피드백 시작일은 Have Your Say 게시일(2026-03-11)로 기재. 유럽의회 표결·본회의 일정은 예정(잠정). 이사회 일반접근 미도출.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# Sources (elv_regulation):
+# - https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2023/0284(COD) (EP 1독회 2026-06-18, 이사회 채택 2026-06-29, 서명 2026-07-08, OJ 2026-07-24)
+# - https://environment.ec.europa.eu/topics/waste-and-recycling/end-life-vehicles_en (발효 2026-08-13, 적용 2028-09-01, 철강·알루미늄 재활용 함량 목표 2033)
+# - https://environment.ec.europa.eu/news/new-rules-more-circular-european-automotive-sector-2026-08-12_en
+# - https://eur-lex.europa.eu/eli/reg/2026/1738/oj/eng
+# - https://www.consilium.europa.eu/en/press/press-releases/2025/12/12/circular-economy-council-and-parliament-strike-deal-on-rules-for-vehicle-circularity-and-management-of-end-of-life-vehicles/ (잠정 합의, 타당성 연구 발효 후 1년 이내)
+# - https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/12633
+# ------------------------------------------------------------
+- id: elv_regulation
+  name_ko: 차량 순환성·폐차 규정 (ELV)
+  name_en: Regulation on circularity requirements for vehicle design and management of end-of-life vehicles (ELV Regulation)
+  status: in_force
+  stage: adopted
+  legal_form: Regulation
+  legal_ref: "Regulation (EU) 2026/1738"
+  dg: ENV
+  category: [product_footprint]
+  steel_relevance: medium
+  effective_date: 2028-09-01
+  summary: >
+    폐차지침(2000/53/EC)과 3R 형식승인지침(2005/64/EC)을 대체하는 규정. 2025.12.12 잠정 합의 후 2026.6.18 유럽의회, 6.29 이사회 채택,
+    7.8 서명, 7.24 관보 게재, 8.13 발효했으며 2028.9.1부터 일반 적용된다. 재활용 플라스틱 함량 의무(2032년 15%, 2036년 25%)를 두고,
+    Commission이 위임법령으로 철강·알루미늄 재활용 함량 목표를 설정해 2033년부터 적용하도록 한다. 적용 범위가 트럭·버스·이륜차로 확대되고,
+    2031년 중반부터 주행 가능 차량만 EU 밖으로 수출할 수 있다.
+  requirements:
+    - type: product_info
+      text: 신차 철강·알루미늄 재활용 함량 목표(위임법령으로 설정, 2033년부터 적용 예정)
+    - type: product_info
+      text: 해체·재활용 용이 설계, 부품 제거 정보, 재활용 플라스틱 함량(2032년 15%, 2036년 25%)
+    - type: trade_measure
+      text: 2031년 중반부터 주행 불가 중고차 역외 수출 금지
+  scope: "M1·N1에서 트럭·버스·이륜차 등으로 확대된 차량 및 폐차, 자동차용 강판(재활용 함량 목표 대상)"
+  sub_acts:
+    - "철강·알루미늄 재활용 함량 목표·산정·검증 방법론 위임법령(예정)"
+  milestones:
+    - date: 2025-12-12
+      label: 이사회·의회 잠정 합의
+    - date: 2026-06-18
+      label: 유럽의회 1독회 채택
+    - date: 2026-06-29
+      label: 이사회 채택
+    - date: 2026-07-24
+      label: 관보 게재
+    - date: 2026-08-13
+      label: 발효
+    - date: 2028-09-01
+      label: 일반 적용 개시
+  consultations: []
+  impact:
+    eu_producers:
+      level: medium
+      obligations: 직접 의무는 자동차 제조사에 부과
+      preparation: 자동차용 강판의 재활용 함량 증빙 체계
+      opportunities: 고품질 스크랩 확보 및 재활용강 수요 확대
+    non_eu_producers:
+      level: medium
+      obligations: EU 완성차 업체에 공급하는 강판의 재활용 함량 데이터 제공(목표 설정 시)
+      preparation: 스크랩 투입률·재활용 함량 산정·검증
+      opportunities: 전기로·고스크랩 강판의 수요 확대
+    korea_note: >
+      한국산 자동차 강판을 EU 완성차·부품사에 공급하거나 EU로 수출되는 한국 완성차에 강판을 공급하는 경우, 철강 재활용 함량 목표(2033년 적용 예정)에 따른
+      함량 데이터 요구가 예상된다. 목표 수준과 산정 방법은 위임법령으로 정해지므로 Commission 타당성 연구와 위임법령 초안 피드백을 주시해야 한다.
+  links:
+    commission: "https://environment.ec.europa.eu/topics/waste-and-recycling/end-life-vehicles_en"
+    eurlex: "https://eur-lex.europa.eu/eli/reg/2026/1738/oj"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/12633-End-of-life-vehicles-revision-of-EU-rules_en"
+  related: [espr, circular_economy_act]
+  verify_needed: true
+  note: >
+    철강 재활용 함량 타당성 연구 기한(이사회 보도자료: 발효 후 1년 이내 / 2차 출처: 2027.9.30)과 위임법령 기한, 정확한 적용 시점은 원문(EUR-Lex 접속 불가)으로 미확인.
+    seed는 pending·trilogue였으나 채택·발효로 변경. 비고: 상태는 시행(발효)이나 일반 적용은 2028.9.1.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# Sources (steel_metals_action_plan):
+# - https://single-market-economy.ec.europa.eu/publications/european-steel-and-metals-action-plan_en (COM(2025) 125, 2025-03-19)
+# - https://data.consilium.europa.eu/doc/document/ST-7288-2025-INIT/en/pdf (본문: 자발적 탄소집약도 라벨, 스크랩 무역조치 검토 Q3 2025, ESPR 재활용 함량 검토, IDB 파일럿)
+# - https://taxation-customs.ec.europa.eu/news/commission-introduces-surveillance-imports-and-exports-metal-scrap-2025-07-23_en (금속 스크랩 수출입 감시 2025-07-23)
+# ------------------------------------------------------------
+- id: steel_metals_action_plan
+  name_ko: 유럽 철강·금속 행동계획
+  name_en: European Steel and Metals Action Plan
+  status: in_force
+  legal_form: Communication
+  legal_ref: "COM(2025) 125"
+  dg: GROW
+  category: [procurement_market, funding_support]
+  steel_relevance: high
+  effective_date: 2025-03-19
+  summary: >
+    2025.3.19 Commission이 발표한 철강·금속 산업 행동계획(비입법 통보문). 에너지 비용 완화, 세이프가드 후속 무역조치, CBAM 우회방지,
+    산업탈탄소가속화법(현 IAA)을 통한 회복력·지속가능성 기준과 ETS 데이터 기반 자발적 탄소집약도 라벨, ESPR을 통한 철강 함량 높은 제품 요건,
+    스크랩 확보(2025년 3분기까지 무역조치 검토, 폐기물 선적규정 활용), 산업탈탄소은행(IDB) 파일럿 경매 등을 제시했다.
+    후속으로 2025.7.23 금속 스크랩(철 스크랩 포함) 수출입 세관 감시가 시작되었다. 라벨은 최종 IAA 제안에서 제외된 것으로 보도되었다.
+  requirements:
+    - type: labelling
+      text: ETS 데이터·CBAM 방법론 기반 자발적 탄소집약도 라벨 개발 예고(IAA 최종 제안에서는 제외 보도)
+    - type: procurement
+      text: 공공조달·공공지원의 회복력·지속가능성 기준 도입 예고(IAA로 구체화)
+    - type: trade_measure
+      text: 스크랩 가용성 확보를 위한 무역조치 검토, 금속 스크랩 수출입 감시
+  scope: "EU 철강·금속 산업 전반(후속 입법·하위법령을 통해 구체화)"
+  sub_acts:
+    - "산업가속화법 제안 COM(2026) 100"
+    - "ESPR 철강 위임법령(준비 중)"
+    - "세이프가드 후속 철강 무역조치"
+    - "금속 스크랩 수출입 세관 감시(2025.7.23)"
+  milestones:
+    - date: 2025-03-19
+      label: 행동계획 발표
+    - date: 2025-07-23
+      label: 금속 스크랩 수출입 세관 감시 개시
+  consultations: []
+  impact:
+    eu_producers:
+      level: medium
+      obligations: 직접 의무 없음(후속 입법으로 구체화)
+      opportunities: 에너지·무역·수요 창출 정책 지원
+    non_eu_producers:
+      level: medium
+      obligations: 직접 의무 없음
+      costs: 후속 무역조치·조달 요건에 따른 간접 영향
+      preparation: 후속 입법(IAA, ESPR 철강, 무역조치) 모니터링
+    korea_note: >
+      행동계획 자체는 구속력이 없으나 한국 철강사에 영향을 주는 후속 조치(세이프가드 후속 쿼터·관세, IAA 저탄소 조달, ESPR 철강 요건, CBAM 우회방지)의
+      출발점이다. 스크랩 수출 제한 논의는 현재 알루미늄 중심이며 철 스크랩은 감시 단계로 확인된다.
+  links:
+    commission: "https://single-market-economy.ec.europa.eu/publications/european-steel-and-metals-action-plan_en"
+    eurlex: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:52025DC0125"
+  related: [industrial_accelerator_act, espr_steel, steel_trade_measure, cbam, industrial_decarbonisation_bank]
+  verify_needed: true
+  note: >
+    신규 추가 항목. 통보문은 법적 '시행' 개념이 없어 status는 발표 완료 의미로 in_force, effective_date는 발표일로 기재.
+    금속 스크랩 감시의 법적 근거(이행규정 번호) 미확인.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# Sources (public_procurement_act):
+# - https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/15492 (CfE·OPC 2025-11-03~2026-01-26, 제안 피드백 2026-09-15~2026-12-22, COM(2026)590)
+# - https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2026/0265(COD) (제안 2026-09-09, 위원회 미배정)
+# - https://single-market-economy.ec.europa.eu/document/download/59557310-3af0-426d-b6b6-0357b650065f_en (COM(2026) 590 원문: 제54조 녹색조달, 유럽 선호, GPA·FTA 당사국 동등 대우, 발효 후 2년 적용)
+# ------------------------------------------------------------
+- id: public_procurement_act
+  name_ko: 공공조달법 (공공조달지침 개정)
+  name_en: Public Procurement Act
+  status: pending
+  stage: proposal
+  legal_form: Regulation
+  legal_ref: "COM(2026) 590, 2026/0265(COD)"
+  dg: GROW
+  category: [procurement_market]
+  steel_relevance: medium
+  summary: >
+    2014년 공공조달 3개 지침을 단일 규정으로 대체하는 제안(2026.9.9). 공공 발주처가 유럽 선호 요건(참여 제한, 최소 Union·대상국 원산지,
+    평가 가점)을 적용할 수 있는 수평적 틀을 만들고, GPA 당사국·EU와 무역협정을 맺은 국가의 사업자는 협정 조건에 따라 동등 대우한다.
+    제54조는 ESPR·CPR 등 부속서 VII 법령의 성능 등급·임계값을 조달 요건으로 사용하도록 하고, Commission이 위임법령으로 저탄소 제품 수요 확보 등을 위한
+    의무 환경 요건을 정할 수 있게 한다. ESPR·CPR·NZIA의 조달 조항을 이관·개정한다. 발효 후 2년 뒤 적용(제안 기준).
+    제안 피드백이 2026.12.22까지 진행 중이다.
+  requirements:
+    - type: procurement
+      text: ESPR·CPR 등 성능 등급·임계값을 조달 사양·평가 기준에 반영, 위임법령으로 의무 환경 요건 설정 가능(제54조)
+    - type: procurement
+      text: 유럽 선호 요건(참여 제한·최소 원산지·가점) 적용 틀, GPA·FTA 대상국 사업자 동등 대우
+    - type: product_info
+      text: 원산지 요건 적용 시 입찰 물품 원산지 표시(해당 시 ESPR 디지털 제품여권 반영)
+  scope: "EU 공공계약·양허계약 전반(건설·인프라 사업의 철강 조달 포함)"
+  sub_acts:
+    - "제54조 녹색조달 의무 환경 요건 위임법령(예정)"
+  milestones:
+    - date: 2025-11-03
+      label: Call for Evidence·공개협의 개시
+    - date: 2026-09-09
+      label: Commission 제안 (COM(2026) 590)
+    - date: 2026-12-22
+      label: 제안 피드백 마감
+  consultations:
+    - type: call_for_evidence
+      title: "Commission Proposal for a Public Procurement Act"
+      start: 2025-11-03
+      end: 2026-01-26
+      summary: 공공조달지침 개정 영향평가 Call for Evidence(Ares(2025)9425851).
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/15492-Revision-of-EU-rules-on-public-procurement_en"
+    - type: public_consultation
+      title: "Public Procurement Directives - revision"
+      start: 2025-11-03
+      end: 2026-01-26
+      summary: 공공조달지침 개정 공개 설문.
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/15492-Revision-of-EU-rules-on-public-procurement_en"
+    - type: draft_act_feedback
+      title: "Proposal for a REGULATION OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL on public contracts and concessions, repealing Directives 2014/23/EU, 2014/24/EU and 2014/25/EU (COM(2026)590)"
+      start: 2026-09-15
+      end: 2026-12-22
+      summary: Commission 제안에 대한 피드백(진행 중). 유럽 선호·녹색조달 조항에 의견 제출 가능.
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/15492-Revision-of-EU-rules-on-public-procurement_en"
+  impact:
+    eu_producers:
+      level: medium
+      obligations: 직접 의무는 공공 발주처에 부과
+      opportunities: 유럽 선호·녹색조달 확대에 따른 공공 수요
+    non_eu_producers:
+      level: medium
+      obligations: 유럽 선호 적용 시 원산지 증빙, 녹색조달 요건 충족
+      preparation: 원산지·제품 환경 데이터(DPP·EPD) 준비
+      opportunities: GPA·FTA 대상국은 동등 대우
+    korea_note: >
+      한국은 GPA 당사국이자 EU FTA 체결국으로 제안상 동등 대우 대상이나, 대우 범위는 협정의 양허 범위에 따른다. 철강의 구체적 저탄소 조달 할당은 IAA가,
+      일반 녹색조달 요건은 이 법(제54조)이 맡는 구조이므로 두 법안을 함께 모니터링해야 한다. 제안 피드백이 2026.12.22까지 열려 있다.
+  links:
+    commission: "https://single-market-economy.ec.europa.eu/document/download/59557310-3af0-426d-b6b6-0357b650065f_en"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/15492-Revision-of-EU-rules-on-public-procurement_en"
+    oeil: "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2026/0265(COD)"
+  related: [industrial_accelerator_act, espr, cpr, nzia]
+  verify_needed: true
+  note: >
+    신규 추가 항목. commission 링크는 제안서 PDF(GROW 사이트)로 별도 정책 페이지 미확인. 유럽의회 소관 위원회 미배정.
+    철강 관련성은 수평적 조달 규칙 차원(중간)으로 판단.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# Sources (circular_economy_act):
+# - https://ec.europa.eu/info/law/better-regulation/brpapi/groupInitiatives/14812 (CfE·OPC 2025-08-01~2025-11-06, 채택 계획 2026 Q4)
+# - https://environment.ec.europa.eu/news/commission-launches-consultation-upcoming-circular-economy-act-2025-08-01_en
+# - https://www.europarl.europa.eu/legislative-train/theme-a-new-plan-for-europe-s-sustainable-prosperity-and-competitiveness/file-circular-economy-act
+# - https://www.euwid-recycling.com/news/markets/circular-economy-act-proposal-expected-on-11-november-061026/ (2026.11.11 제안 예정 보도)
+# - https://data.consilium.europa.eu/doc/document/ST-7288-2025-INIT/en/pdf (행동계획: 스크랩 단일시장·폐기물 분류)
+# ------------------------------------------------------------
+- id: circular_economy_act
+  name_ko: 순환경제법
+  name_en: Circular Economy Act
+  status: pending
+  stage: consultation
+  legal_form: Regulation
+  dg: ENV
+  category: [product_footprint, procurement_market]
+  steel_relevance: medium
+  summary: >
+    2차 원료 단일시장 조성, 고품질 재활용 원료 공급·수요 확대를 목표로 하는 입법 예정안. 2025.8.1~11.6 Call for Evidence·공개협의를 마쳤고,
+    Have Your Say상 채택 계획은 2026년 4분기다. 보도에 따르면 규제심사위원회 지적으로 지연되어 2026.11.11 제안이 예정되어 있으며,
+    EPR 조화, 폐기물 분류·정의 조화, 순환자원 순환 원활화(국경 간 이동 간소화), 폐기물 종료 기준 개정, WEEE 개정 등을 담을 것으로 알려졌다.
+    철강·금속 행동계획은 이 법으로 금속 스크랩 단일시장과 분류 개선을 추진하겠다고 밝혔다.
+  requirements:
+    - type: product_info
+      text: 2차 원료(스크랩 포함) 폐기물 분류·폐기물 종료 기준 조화, 재활용 원료 수요 촉진(제안 전)
+  scope: "2차 원료 시장 전반(금속 스크랩 포함), 구체적 범위는 제안 공개 후 확인"
+  milestones:
+    - date: 2025-08-01
+      label: Call for Evidence·공개협의 개시
+    - date: 2025-11-06
+      label: Call for Evidence·공개협의 마감
+  consultations:
+    - type: call_for_evidence
+      title: "Circular Economy Act"
+      start: 2025-08-01
+      end: 2025-11-06
+      summary: 순환경제법 영향평가 Call for Evidence(Ares(2025)6250342).
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14812-Circular-Economy-Act_en"
+    - type: public_consultation
+      title: "PUBLIC CONSULTATION QUESTIONNAIRE Circular Economy Act"
+      start: 2025-08-01
+      end: 2025-11-06
+      summary: 2차 원료 공급·수요, 순환 비즈니스 장벽 등에 대한 공개 설문.
+      url: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14812-Circular-Economy-Act_en"
+  impact:
+    eu_producers:
+      level: medium
+      opportunities: 역내 스크랩 확보·유통 원활화
+      preparation: 스크랩 품질·분류 체계 대응
+    non_eu_producers:
+      level: low
+      obligations: 직접 의무는 제안 공개 전 불명
+      costs: 스크랩 역외 유출 억제 조치 포함 시 국제 스크랩 수급에 간접 영향
+    korea_note: >
+      제안이 공개되지 않아 직접 영향은 불명이다. 전기로 확대를 추진하는 한국 철강사는 EU 스크랩 수출 억제·재활용 함량 요건 등 스크랩 수급에 영향을 줄
+      조항이 포함되는지 2026.11 제안 공개 시 확인할 필요가 있다.
+  links:
+    commission: "https://environment.ec.europa.eu/news/commission-launches-consultation-upcoming-circular-economy-act-2025-08-01_en"
+    have_your_say: "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/14812-Circular-Economy-Act_en"
+  related: [elv_regulation, espr, steel_metals_action_plan]
+  verify_needed: true
+  note: >
+    신규 추가 항목. 제안 예정일(2026.11.11)은 업계 언론 보도로 미확정. 법적 형식(Regulation)은 예상이며 미확인. 스크랩 관련 조항 포함 여부 미확인.
+  last_verified: 2026-10-27
+
+# ------------------------------------------------------------
+# Sources (industrial_decarbonisation_bank):
+# - https://single-market-economy.ec.europa.eu/industry/sustainability/net-zero-industry-act/net-zero-navigator/list-instruments/industrial-decarbonisation-bank_en (1,000억 유로 목표, 경쟁력기금 거버넌스)
+# - https://climate.ec.europa.eu/news-other-reads/news/commission-publishes-terms-and-conditions-first-pilot-auction-industrial-heat-decarbonisation-budget-2025-10-10_en (IF25 파일럿 경매 조건 2025-10-10)
+# - https://climate.ec.europa.eu/news-other-reads/news/commission-publishes-terms-and-conditions-eur1-billion-industrial-heat-decarbonisation-auction-2026-09-24_en (IF26 열 경매 10억 유로, 2026.12 초 입찰 개시 예정)
+# - https://data.consilium.europa.eu/doc/document/ST-7288-2025-INIT/en/pdf
+# ------------------------------------------------------------
+- id: industrial_decarbonisation_bank
+  name_ko: 산업탈탄소은행 (IDB) 및 파일럿 경매
+  name_en: Industrial Decarbonisation Bank (IDB) and pilot auctions
+  status: pending
+  stage: preparation
+  legal_form: Other
+  dg: CLIMA
+  category: [funding_support]
+  steel_relevance: low
+  summary: >
+    청정산업딜에서 발표한 1,000억 유로 규모 산업 탈탄소 자금 조달 이니셔티브로 혁신기금, ETS 일부 수입, InvestEU 개정을 재원으로 하며
+    향후 경쟁력기금 거버넌스에 편입될 예정이다. 파일럿으로 혁신기금 IF25 산업 공정열 탈탄소 경매(10억 유로, 2025.10.10 조건 공고)가 시행되었고,
+    2026.9.24 IF26 열 경매(10억 유로) 조건이 공고되어 2026.12 초 입찰 개시가 예정되어 있다. 철강을 포함한 EEA 내 모든 산업 부문이 대상이다.
+  requirements: []
+  scope: "EEA 내 산업 탈탄소 프로젝트(철강 포함). 비EU 생산자는 대상 아님"
+  sub_acts:
+    - "혁신기금 IF25 산업 공정열 탈탄소 파일럿 경매"
+    - "혁신기금 IF26 산업 공정열 경매"
+  milestones:
+    - date: 2025-10-10
+      label: IF25 파일럿 경매 조건 공고
+    - date: 2026-02-19
+      label: IF25 경매 신청 마감
+    - date: 2026-09-24
+      label: IF26 열 경매 조건 공고
+  consultations: []
+  impact:
+    eu_producers:
+      level: medium
+      opportunities: 탈탄소 설비 투자 보조(경매 방식)
+      preparation: 경매 입찰 준비
+    non_eu_producers:
+      level: low
+      obligations: 직접 의무 없음
+      costs: EU 경쟁사의 저탄소 전환 가속에 따른 간접 경쟁 영향
+    korea_note: >
+      한국 철강사는 지원 대상이 아니다. EU 경쟁사의 수소환원·전기화 투자에 대한 공적 지원이 확대되면 EU 시장의 저탄소 철강 공급이 늘어
+      IAA·ESPR의 저탄소 요건과 맞물려 한국산 제품의 상대적 경쟁 조건에 영향을 줄 수 있다.
+  links:
+    commission: "https://single-market-economy.ec.europa.eu/industry/sustainability/net-zero-industry-act/net-zero-navigator/list-instruments/industrial-decarbonisation-bank_en"
+    guidance: "https://climate.ec.europa.eu/news-other-reads/news/commission-publishes-terms-and-conditions-eur1-billion-industrial-heat-decarbonisation-auction-2026-09-24_en"
+  related: [steel_metals_action_plan, ets_review]
+  verify_needed: true
+  note: >
+    신규 추가 항목. IDB 자체의 법적 근거·입법 형식 미확인(Commission 페이지에 미기재, 경쟁력기금·ETS 개정과 연계 예정).
+    IF25 신청 마감일(2026-02-19)은 2차 출처 기반. IF26 입찰 개시일은 '2026.12 초'로만 공지되어 날짜 미기재. 철강 관련성은 한국 수출 관점에서 low로 판단.
+  last_verified: 2026-10-27

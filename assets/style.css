@@ -1,0 +1,56 @@
+/* EU 철강 탄소중립 정책 트래커 — 공통 스타일 (이 파일 하나에서만 관리)
+ * 색 기준값은 src/theme.py의 CHART / LEVEL_HEX와 같다.
+ * 배경은 반투명(rgba)으로 써서 라이트·다크 테마 모두에서 어울리게 한다. */
+
+/* ---- 레이아웃 ---- */
+.block-container { padding-top: 2.2rem; max-width: 1400px; }
+[data-testid="stMain"] { overflow-x: hidden; }
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] li { word-break: keep-all; overflow-wrap: anywhere; }
+[data-testid="stCaptionContainer"] { word-break: keep-all; overflow-wrap: anywhere; }
+
+/* 페이지 머리말 */
+.page-sub { margin: -0.6rem 0 1rem; opacity: 0.7; font-size: 0.92rem; }
+
+/* 섹션 제목 아래 얇은 구분선 */
+.section-title { font-weight: 700; font-size: 1.08rem; margin: 1.2rem 0 0.4rem;
+  padding-bottom: 0.3rem; border-bottom: 1px solid rgba(128, 128, 128, 0.25); }
+
+/* ---- 정책 카드 ---- */
+.card-title { font-weight: 700; font-size: 1.02rem; line-height: 1.4; }
+.card-sub { font-size: 0.8rem; opacity: 0.65; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---- 입법 단계 스텝 ---- */
+.stepper { display: flex; flex-wrap: wrap; gap: 0.3rem; list-style: none; padding: 0 !important; margin: 0.3rem 0 0.8rem !important; }
+.stepper li { flex: 1 1 88px; text-align: center; font-size: 0.78rem; line-height: 1.3; padding: 0.45rem 0.3rem;
+  border-radius: 0.45rem; border: 1px solid rgba(128, 128, 128, 0.35); opacity: 0.55; margin: 0; }
+.stepper li .num { display: block; font-size: 0.68rem; opacity: 0.75; }
+.stepper li.done { opacity: 0.9; background: rgba(62, 142, 65, 0.12); border-color: rgba(62, 142, 65, 0.5); }
+.stepper li.current { opacity: 1; font-weight: 700; background: rgba(59, 120, 194, 0.16); border: 2px solid #3B78C2; }
+
+/* ---- D-day 상자 ---- */
+.dday { text-align: center; border-radius: 0.5rem; padding: 0.55rem 0.2rem; font-weight: 800;
+  font-size: 1.3rem; line-height: 1.15; border: 1px solid rgba(128, 128, 128, 0.35); }
+.dday small { display: block; font-size: 0.7rem; font-weight: 500; opacity: 0.85; margin-top: 0.15rem; }
+.dday.urgent { color: #D64545; background: rgba(214, 69, 69, 0.1); border-color: rgba(214, 69, 69, 0.5); }
+.dday.open { color: #7B61C9; background: rgba(123, 97, 201, 0.1); border-color: rgba(123, 97, 201, 0.45); }
+.dday.upcoming { color: #3B78C2; background: rgba(59, 120, 194, 0.1); border-color: rgba(59, 120, 194, 0.45); }
+.dday.closed { opacity: 0.55; font-size: 1rem; }
+
+/* ---- 사이드바 마감 알림 ---- */
+.alert-item { font-size: 0.86rem; line-height: 1.35; margin: 0.15rem 0 0.1rem; }
+.alert-item b { color: #D64545; margin-right: 0.25rem; }
+.alert-item .meta { display: block; font-size: 0.76rem; opacity: 0.7; }
+
+/* ---- 모바일 ---- */
+@media (max-width: 640px) {
+  /* 상단 고정 헤더(사이드바 버튼)에 제목이 가리지 않도록 위 여백 확보 */
+  .block-container { padding: 4.25rem 1rem 3rem; }
+  /* KPI 카드는 세로 4줄 대신 2열로 (st.container(key="kpis")) */
+  .st-key-kpis [data-testid="stHorizontalBlock"] { flex-flow: row wrap; gap: 0.5rem; }
+  .st-key-kpis [data-testid="stColumn"] { flex: 1 1 calc(50% - 0.5rem) !important; min-width: calc(50% - 0.5rem) !important; width: auto !important; }
+  .st-key-kpis [data-testid="stMetricValue"] { font-size: 1.5rem; }
+  h1 { font-size: 1.45rem !important; }
+  .stepper li { flex-basis: 64px; font-size: 0.7rem; padding: 0.35rem 0.2rem; }
+  .dday { font-size: 1.1rem; }
+}
